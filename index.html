@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Capturing Tacit Design for Manufacturing Knowledge from Unstructured Discourse · ASME IDETC 2026</title>
+<meta name="description" content="Companion site for ASME IDETC 2026 paper DETC2026-194799 by McGowan and Goucher-Lambert." />
+<meta name="author" content="Douglas P. McGowan, Kosa Goucher-Lambert" />
+<meta name="color-scheme" content="light dark" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=JetBrains+Mono:wght@400;500&display=swap" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ================== MASTHEAD ================== -->
+<header class="masthead page">
+  <p class="eyebrow">Proceedings of the ASME 2026 IDETC-CIE &middot; Paper DETC2026-194799 &middot; Houston, TX &middot; Aug 23–26, 2026</p>
+  <h1 class="hed">Capturing Tacit Design for Manufacturing Knowledge from Unstructured Discourse</h1>
+  <p class="subhed">Draft companion essay to the ASME IDETC submission.</p>
+  <p class="byline">
+    <strong>Douglas P. McGowan</strong> &middot; <strong>Kosa Goucher-Lambert</strong><br />
+    University of California, Berkeley &middot; Berkeley, CA<br />
+    <em>Corresponding: <a href="mailto:kosa@berkeley.edu">kosa@berkeley.edu</a></em>
+  </p>
+  <p class="meta">
+    <span>Keywords</span>
+    <span class="dot">·</span>
+    <span>Design for manufacturing</span>
+    <span class="dot">·</span>
+    <span>Knowledge graph</span>
+    <span class="dot">·</span>
+    <span>Human-AI interaction</span>
+  </p>
+</header>
+
+<!-- ================== TOC ================== -->
+<nav class="toc" aria-label="Contents">
+  <div class="page">
+    <p class="toc-label">Contents</p>
+    <ol class="toc-list">
+      <li><a href="#abstract"><span class="toc-num">i</span><span class="toc-text">Abstract</span></a></li>
+      <li><a href="#introduction"><span class="toc-num">ii</span><span class="toc-text">Introduction</span></a></li>
+      <li><a href="#related-work"><span class="toc-num">iii</span><span class="toc-text">Related work</span></a></li>
+      <li><a href="#methodology"><span class="toc-num">iv</span><span class="toc-text">Methodology</span></a></li>
+      <li><a href="#results"><span class="toc-num">v</span><span class="toc-text">Results and evaluation</span></a></li>
+      <li><a href="#discussion"><span class="toc-num">vi</span><span class="toc-text">Discussion</span></a></li>
+      <li><a href="#conclusion"><span class="toc-num">vii</span><span class="toc-text">Conclusion</span></a></li>
+      <li><a href="#acknowledgments"><span class="toc-num">viii</span><span class="toc-text">Acknowledgments</span></a></li>
+      <li><a href="#references"><span class="toc-num">ix</span><span class="toc-text">References</span></a></li>
+      <li><a href="#appendix-a"><span class="toc-num">x</span><span class="toc-text">Appendix A · Pipeline diagnostics</span></a></li>
+      <li><a href="#appendix-b"><span class="toc-num">xi</span><span class="toc-text">Appendix B · Example agent output</span></a></li>
+    </ol>
+  </div>
+</nav>
+
+<main>
+
+<!-- ================== § i · Abstract ================== -->
+<section id="abstract" class="bay">
+  <div class="page">
+    <div class="section-mark">
+      <span class="section-num">§ i</span>
+      <span class="section-title">Abstract</span>
+    </div>
+    <div class="opening">
+      <p><span class="dropcap">I</span>mplementing <span class="term" tabindex="0">design for manufacturing<span class="tip"><strong>Design for Manufacturing (DFM):</strong> designing a part so it can actually be manufactured efficiently — accounting for machining constraints, material limits, tolerances, and assembly feasibility at the design stage.</span></span> in the early stages of product development can have significant effects on timeline and budget, but can be a difficult undertaking. Current approaches to automating rule-based feedback using <span class="term" tabindex="0">large language models<span class="tip"><strong>Large Language Model (LLM):</strong> a neural network trained on vast amounts of text that can generate and reason about language. Examples include GPT-5 and Claude.</span></span> (LLMs) and machine learning do not adequately capture the complex manufacturing context around a product.</p>
+      <p>A large part of the knowledge and experience used in giving manufacturability feedback is either <span class="term" tabindex="0">tacit<span class="tip"><strong>Tacit knowledge:</strong> knowledge gained through experience that is difficult to write down formally. Polanyi's phrase: "we know more than we can tell."</span></span> or lacking in structured documentation. This makes it difficult for designers to access this knowledge when seeking to consider manufacturability. This also presents a challenge for AI-in-design interventions, as there lacks an accurate way for AI models to access and reason with this tacit knowledge.</p>
+      <p>Thus, we present a knowledge extraction method that enables AI to better augment early-stage concept design. Using post data from machining forums, we capture the tacit knowledge and experiences communicated by machinists and engineers, structuring it into a scalable knowledge base. The base consists of a <span class="term" tabindex="0">multi-vector embedded space<span class="tip"><strong>Multi-vector embedded space:</strong> each piece of knowledge is represented by several numerical vectors, one per facet (content, style, metadata). Similar vectors cluster together, enabling semantic search along each facet separately.</span></span> and a <span class="num">3,879</span>-node <span class="term" tabindex="0">knowledge graph<span class="tip"><strong>Knowledge graph:</strong> a network where concepts are nodes and labelled edges carry meaning (e.g., <em>causes</em>, <em>contradicts</em>, <em>specifies</em>) — enabling machine reasoning over relationships, not just keyword matching.</span></span>.</p>
+      <p>The quality of the extracted knowledge is validated using automated LLM verification calibrated by human expert review. This contributes a unique dataset on machining discourse and tacit knowledge, while demonstrating a method for transforming unstructured natural language data into useful design for manufacturing insights. These contributions enable AI to function as an <em>extradisciplinary sensemaker</em> that expands the designer's capacity to account for external constraints.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================== § ii · Introduction ================== -->
+<section id="introduction" class="bay">
+  <div class="page">
+    <div class="section-mark">
+      <span class="section-num">§ ii</span>
+      <span class="section-title">Introduction</span>
+    </div>
+    <p>In mechanical product design, accounting for manufacturing constraints is an essential part of the design process and has significant impacts on the later stages of product development. Design-for-manufacturing (DFM) is complex, and requires expert-level manufacturing knowledge that can be difficult or inefficient for designers to learn and access. This paper explores how DFM expertise can be extracted from unstructured natural language data and structured into a machine-readable knowledge base. This knowledge base can help future AI systems give more accurate and thorough design feedback grounded in concrete human expertise. We then test this knowledge base through an agentic DFM feedback workflow.</p>
+
+    <p>A large part of a product's lifecycle cost is committed during the early design stage<a class="cite" href="#ref-ehrlenspiel2007">[<span class="ref-num">1</span>]<span class="tip">Ehrlenspiel, Kiewert &amp; Lindemann (2007). <em>Cost-Efficient Design.</em> ASME Press / Springer.</span></a><a class="cite" href="#ref-boothroyd1994">[<span class="ref-num">2</span>]<span class="tip">Boothroyd, Dewhurst &amp; Knight (1994). <em>Product Design for Manufacture and Assembly.</em> Marcel Dekker.</span></a>, and late-stage rebuilds risk overextending project timelines<a class="cite" href="#ref-chang2011">[<span class="ref-num">3</span>]<span class="tip">Chang, Wysk &amp; Wang (2006). <em>Computer-Aided Manufacturing</em> (3rd ed.). Prentice Hall.</span></a>. The concept generation and selection processes that occur in early-stage mechanical design could benefit from greater manufacturability awareness, but early-stage DFM remains difficult<a class="cite" href="#ref-odriscoll2002">[<span class="ref-num">4</span>]<span class="tip">O'Driscoll (2002). <em>Design for Manufacture.</em> J. Materials Processing Technology, 122(2–3).</span></a><a class="cite" href="#ref-gupta1997">[<span class="ref-num">5</span>]<span class="tip">Gupta, Regli, Das &amp; Nau (1997). <em>Automated Manufacturability Analysis: A Survey.</em> Research in Engineering Design, 9(3).</span></a>. The rule-based geometric constraints common in most forms of DFM do not adequately capture the numerous considerations needed to design a manufacturable part.</p>
+
+    <p>Common examples of rule-based DFM heuristics include automated checking of problematic features like deep pockets, thin walls and small fillets. Digital tools like Siemens NX Checkmate, DFMPro and CoLab perform DFM analysis of CAD designs. These tools use geometry rules, historical quoting data, and supplier databases to evaluate a part's manufacturability.</p>
+
+    <p>The heuristics used by digital DFM platforms guard against common mechanical design pitfalls, but a large part of DFM failures remain unaddressed<a class="cite" href="#ref-gupta1997">[<span class="ref-num">5</span>]<span class="tip">Gupta et al. (1997). <em>Automated Manufacturability Analysis.</em></span></a><a class="cite" href="#ref-formentini2022">[<span class="ref-num">6</span>]<span class="tip">Formentini, Rodriguez &amp; Favi (2022). <em>DfMA in the Product Development Process.</em> Int. J. Adv. Manuf. Technology, 120.</span></a>. Examples of these include failures caused by limitations in manufacturer capability, context-dependent process constraints, and assembly-level conflicts. Failures like these cannot simply be addressed with the available tools and processes<a class="cite" href="#ref-gupta1997">[<span class="ref-num">5</span>]<span class="tip">Gupta et al. (1997).</span></a><a class="cite" href="#ref-odriscoll2002">[<span class="ref-num">4</span>]<span class="tip">O'Driscoll (2002).</span></a>. Many unsolved DFM roadblocks trace back to the tacit nature of manufacturing expertise. Machining is a clear example: seasoned practitioners hold deep experiential knowledge that is either undocumented or entirely tacit<a class="cite" href="#ref-nonaka1995">[<span class="ref-num">7</span>]<span class="tip">Nonaka &amp; Takeuchi (1995). <em>The Knowledge-Creating Company.</em> Oxford University Press.</span></a><a class="cite" href="#ref-sun2024">[<span class="ref-num">8</span>]<span class="tip">Sun, Huang, Jiang, Lu &amp; Yang (2024). <em>On Tacit Knowledge Management in Product Design.</em> J. Engineering Design, 35(1).</span></a>. This tacit and experiential knowledge plays a crucial role in the thought process behind manufacturability feedback, but is difficult for designers to know during early-stage design. Structuring tacit and experiential knowledge for digital communication is also challenging. While researching DFM, this paper focuses on machining as a subdiscipline due to its prevalence in multiple industries and the significant amount of unmapped expertise held by seasoned practitioners<a class="cite" href="#ref-deloitte2024">[<span class="ref-num">9</span>]<span class="tip">Deloitte &amp; The Manufacturing Institute (2024). <em>Creating Pathways for Tomorrow's Workforce Today.</em></span></a>.</p>
+
+    <p>Current DFM research focuses on the automation of geometric assessment using computational tools and AI integrations<a class="cite" href="#ref-formentini2022">[<span class="ref-num">6</span>]<span class="tip">Formentini et al. (2022).</span></a><a class="cite" href="#ref-odriscoll2002">[<span class="ref-num">4</span>]<span class="tip">O'Driscoll (2002).</span></a>. This can accelerate formal heuristics implementation, but is not effective for involving nuanced context-dependent information — manufacturer capabilities, equipment, and past experiences — that varies across organizations, settings and times. This information is essential for DFM and often drives design feedback that requires costly rebuilds. For manufacturers, communicating their requirements and constraints to designers early or clearly enough remains difficult because their feedback depends on tacit and context-dependent information and knowledge. Thus, there exists a need to capture experiential and tacit knowledge in an efficient manner.</p>
+
+    <p>There is also an opportunity to explore how to structure this knowledge for future AI-in-design interventions. Currently, AI tools like large language models (LLMs), vision language models (VLMs), and reasoning agents have demonstrated capability in providing feedback, performing research, and generating ideas in the design process. By making expert knowledge machine-readable, we can cultivate the expertise and contextual awareness of an AI model for DFM interventions to be more reliably accurate.</p>
+
+    <h3>Research questions</h3>
+    <p>We explore the overarching topic: <em>In what ways can knowledge graphs capture experiential knowledge in design and manufacturing from discourse and conversation data?</em> In parallel, we focus on the following research questions:</p>
+    <ol class="num-list">
+      <li><strong>RQ1.</strong> What types of knowledge do technical practitioners communicate in online forums?</li>
+      <li><strong>RQ2.</strong> What types of knowledge and discourse can be captured in a machine-readable format using knowledge graphs and embedding spaces?</li>
+      <li><strong>RQ3.</strong> How can subjective semantic review be automated using large language models (LLMs)?</li>
+    </ol>
+
+    <p style="margin-top:2rem;">To address these questions, we develop a multi-vector embedded space and a knowledge graph constructed from a corpus of design and machining forum posts. Online technical forums have been shown to be high-quality repositories of expert knowledge<a class="cite" href="#ref-mamykina2011">[<span class="ref-num">10</span>]<span class="tip">Mamykina, Manoim, Mittal, Hripcsak &amp; Hartmann (2011). <em>Design Lessons from the Fastest Q&amp;A Site in the West.</em> CHI '11.</span></a><a class="cite" href="#ref-sun2024">[<span class="ref-num">8</span>]<span class="tip">Sun et al. (2024).</span></a>, containing discourse with valuable practical insights that are not always captured in traditional textbooks. With the forum post data, we demonstrate a process for extracting specific pieces of knowledge from unstructured natural language, referred to as <span class="term" tabindex="0"><em>frames</em><span class="tip"><strong>Knowledge frame:</strong> a structured, machine-readable unit of knowledge — drawing on Minsky's frame representation paradigm. Each frame has a main point, source quote, type, scope, applicability, and metadata fields.</span></span> in this paper — drawing on Minsky's frame representation paradigm<a class="cite" href="#ref-minsky1975">[<span class="ref-num">11</span>]<span class="tip">Minsky (1975). <em>A Framework for Representing Knowledge,</em> in <em>The Psychology of Computer Vision</em>, ed. Winston. McGraw-Hill.</span></a>. An automated review process calibrated on human expert feedback is used to verify the accuracy and utility of the frames, and an agentic application case study demonstrates the broader applications.</p>
+  </div>
+</section>
+
+<!-- ================== § iii · Related Work ================== -->
+<section id="related-work" class="bay">
+  <div class="page">
+    <div class="section-mark">
+      <span class="section-num">§ iii</span>
+      <span class="section-title">Related work</span>
+    </div>
+    <p>This section contains a review of relevant research. We start by establishing the limitations of current DFM processes and identifying tacit knowledge as a critical gap. Then, we survey existing methods of capturing knowledge and using LLMs to validate semantic accuracy. Finally, we discuss growth opportunities for AI's role in design.</p>
+
+    <h3>Limits in current design-for-manufacturability practices</h3>
+    <p>Existing research highlights the limits of DFM, especially in the modality of knowledge transfer and communication between designer and manufacturer. These limits exist for multiple reasons, including organization growth further separating designer and manufacturer, unorganized manufacturing knowledge documentation, and an incompatibility between the traditional rigidity of DFM heuristics and the fluid nature of a real-world manufacturing setting<a class="cite" href="#ref-boothroyd1994">[<span class="ref-num">2</span>]<span class="tip">Boothroyd, Dewhurst &amp; Knight (1994).</span></a><a class="cite" href="#ref-gupta1997">[<span class="ref-num">5</span>]<span class="tip">Gupta et al. (1997).</span></a><a class="cite" href="#ref-odriscoll2002">[<span class="ref-num">4</span>]<span class="tip">O'Driscoll (2002).</span></a>. Additionally, a recent review exposes the divergence of recommended DFM methods across various design and research contexts<a class="cite" href="#ref-formentini2022">[<span class="ref-num">6</span>]<span class="tip">Formentini et al. (2022).</span></a><a class="cite" href="#ref-tomiyama2009">[<span class="ref-num">12</span>]<span class="tip">Tomiyama, Gu, Jin, Lutters, Kind &amp; Kimura (2009). <em>Design Methodologies: Industrial and Educational Applications.</em> CIRP Annals, 58(2).</span></a>. This demonstrates the need for generalizable knowledge transfer methods for designers and manufacturers in diverse contexts.</p>
+
+    <p>Moreover, research shows that designers often lack the disciplinary expertise to apply manufacturability constraints during early concept development<a class="cite" href="#ref-odriscoll2002">[<span class="ref-num">4</span>]<span class="tip">O'Driscoll (2002).</span></a><a class="cite" href="#ref-gupta1997">[<span class="ref-num">5</span>]<span class="tip">Gupta et al. (1997).</span></a>, resulting in manufacturability issues that surface only after design decisions have been made. Our work demonstrates a versatile method for capturing and synthesizing complex expert-level DFM insights from multiple contexts. Specifically, the created dataset is useful for bridging knowledge gaps in design for machining.</p>
+
+    <h3>Addressing the tacit knowledge gap</h3>
+    <p>Earlier research into this same knowledge gap highlighted key causes that remain today: lack of extra-disciplinary knowledge, organizational rigidity, and insufficient integration of manufacturing data during the design phase<a class="cite" href="#ref-boothroyd1994">[<span class="ref-num">2</span>]<span class="tip">Boothroyd et al. (1994).</span></a><a class="cite" href="#ref-gupta1997">[<span class="ref-num">5</span>]<span class="tip">Gupta et al. (1997).</span></a>. Making this knowledge available to designers in a better way first requires capturing it. In general, there is a great part of knowledge and reasoning that can be classified as tacit, in that it is important and often referenced, but rarely explicitly stated and methodically documented. The communication gap between expert designer and expert manufacturer is multifaceted, but one impactful part of it is the gap in tacit knowledge.</p>
+
+    <p>The knowledge creation theory confirms the tacit nature of some parts of technical knowledge, showing the hands-on practice involved in acquiring it<a class="cite" href="#ref-nonaka1995">[<span class="ref-num">7</span>]<span class="tip">Nonaka &amp; Takeuchi (1995).</span></a>. Both the learning and the documentation are informal and unstructured, which allows for agility in developing new practices, workarounds, and adjustments in a dynamic environment. However, this dynamic nature of the manufacturing environment also makes it difficult to standardize knowledge, which keeps much of tacit knowledge from becoming explicitly documented. There often is no official place for tacit knowledge to be discovered or referenced, except through extended communication and manual feedback. Furthermore, this tacit knowledge may also be lost. Recent research shows a risk of losing large amounts of tacit knowledge due to the aging workforce and transitioning industry requirements<a class="cite" href="#ref-sun2024">[<span class="ref-num">8</span>]<span class="tip">Sun et al. (2024).</span></a><a class="cite" href="#ref-deloitte2024">[<span class="ref-num">9</span>]<span class="tip">Deloitte &amp; The Manufacturing Institute (2024).</span></a>. If this knowledge is not captured, it may not be accessible in the future.</p>
+
+    <p>Even now, in the early stage of design, incorporating expert tacit knowledge is difficult, as there are often multiple different angles of expertise from which to consider each design. Furthermore, tacit knowledge is highly context-dependent, and it can be difficult to explain when the knowledge factors in to a decision. Current methods of using LLMs to broaden and accelerate research and feedback risk hallucination and overgeneralization because of the lack of machine-readable tacit knowledge and the inefficiencies of reasoning over large texts<a class="cite" href="#ref-lewis2020">[<span class="ref-num">13</span>]<span class="tip">Lewis et al. (2020). <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.</em> NeurIPS.</span></a><a class="cite" href="#ref-pan2024">[<span class="ref-num">14</span>]<span class="tip">Pan, Luo, Wang, Chen, Wang &amp; Wu (2024). <em>Unifying Large Language Models and Knowledge Graphs: A Roadmap.</em> IEEE TKDE, 36(7).</span></a>. The work in this paper demonstrates a way to map high-context tacit knowledge in a format over which language models can effectively reason.</p>
+
+    <h3>Computational knowledge capture methods</h3>
+    <p>Collecting reasoning-accessible knowledge is a challenge of its own. Earlier research presented natural language processing (NLP) techniques to construct knowledge graphs from structured documents<a class="cite" href="#ref-sarica2020">[<span class="ref-num">15</span>]<span class="tip">Sarica, Luo &amp; Wood (2020). <em>TechNet: Technology Semantic Network Based on Patent Data.</em> Expert Systems with Applications, 142.</span></a>. Multiple agents would collaborate on the data analysis, which mimics the social nature of tacit knowledge transfer<a class="cite" href="#ref-fenoglio2022">[<span class="ref-num">16</span>]<span class="tip">Fenoglio, Kazim, Latapie &amp; Koshiyama (2022). <em>Tacit Knowledge Elicitation Process for Industry 4.0.</em> Discover AI, 2(1).</span></a>. Other work focused on computational design applications, analyzing CAD files and engineering drawings to infer design decisions<a class="cite" href="#ref-sanya2023">[<span class="ref-num">17</span>]<span class="tip">Sanya &amp; Shehab (2023). <em>Towards a Knowledge Graph Framework for Ad Hoc Analysis in Manufacturing.</em></span></a><a class="cite" href="#ref-jia2024">[<span class="ref-num">18</span>]<span class="tip">Jia, Zhang &amp; Saad (2024). <em>Knowledge Graph-Based Multi-Granularity Tacit Design Knowledge Reuse.</em> JCDE, 12(1).</span></a>.</p>
+
+    <p>These methods allow for more machine-readable knowledge that AI can reference. In processing this data, LLMs read and structure the data, while also collecting data from workers directly. Related work also identifies the weakness of this process, as it only captures the structured parts of the design and manufacturing process, with limited exploration into the tacit, informal decision-making and experiential learning elements<a class="cite" href="#ref-fenoglio2022">[<span class="ref-num">16</span>]<span class="tip">Fenoglio et al. (2022).</span></a><a class="cite" href="#ref-kernanfreire2023chi">[<span class="ref-num">19</span>]<span class="tip">Kernan Freire et al. (2023). <em>Tacit Knowledge Elicitation for Shop-Floor Workers with an Intelligent Assistant.</em> CHI '23 EA.</span></a>.</p>
+
+    <p>A paper by Goridkov et al. conducted a study to collect data on the experiential knowledge collection process, mentioning future potential for scalability<a class="cite" href="#ref-goridkov2023jmd">[<span class="ref-num">20</span>]<span class="tip">Goridkov, Rao, Cui, Grandi, Wang &amp; Goucher-Lambert (2023). <em>Embedding Experiential Design Knowledge in Interactive Knowledge Graphs.</em> J. Mechanical Design, 145(4).</span></a>. Other related work focuses on developing a multimodal dataset on design failures to form an interactive embedded space and a predictive model for potential design failures<a class="cite" href="#ref-bolanos2025">[<span class="ref-num">21</span>]<span class="tip">Bolanos, Ataei, Grandi &amp; Goucher-Lambert (2025). <em>RECALL-MM: A Multimodal Dataset of Consumer Product Recalls.</em> ASME IDETC/CIE 2025.</span></a>. The embedded space was used to show designers related product failures during the ideation stage, and the LLM-powered predictive model was shown to reach near-expert reliability.</p>
+
+    <p>Collectively, this past research points to a gap in collecting, analyzing and structuring engineering knowledge. Our work demonstrates a streamlined method of capturing experiential knowledge by using existing forum data to capture both tacit and experiential knowledge. This also allows for collection of a larger and more diverse dataset, enabling future agentic systems to use a more versatile knowledge base. Our work expands on existing data structuring methods by combining an embedded space with a semantic knowledge graph, enabling a two-fold source of historical and experiential data. This format makes the dataset accessible through both manual searches and agentic retrieval.</p>
+
+    <h3>Validating data using LLMs</h3>
+    <p>For large datasets like the one in this paper to be reliable for use in engineering design, they must be carefully validated. This is a demanding task for humans alone; recent research has investigated the use of LLMs to validate both designs and datasets. While human review involves having engineers with machining expertise review knowledge extractions or graph reasoning outputs for quality, the <span class="term" tabindex="0">LLM-as-a-judge<span class="tip"><strong>LLM-as-a-judge:</strong> using a language model to evaluate another model's outputs — a way to automate quality review when human review does not scale. Works best when calibrated against human gold-standard examples.</span></span> automates this process<a class="cite" href="#ref-zheng2023">[<span class="ref-num">22</span>]<span class="tip">Zheng et al. (2023). <em>Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena.</em> NeurIPS.</span></a>. While 80% agreement can be found in general areas, this agreement does lessen when considering expert domains<a class="cite" href="#ref-szymanski2024">[<span class="ref-num">23</span>]<span class="tip">Szymanski et al. (2024). <em>Limitations of the LLM-as-a-Judge Approach for Evaluating LLM Outputs in Expert Knowledge Tasks.</em> ACM IUI 2025.</span></a>. There is also a demonstrated bias toward lay user preferences due to biases in LLM training data<a class="cite" href="#ref-chen2024">[<span class="ref-num">24</span>]<span class="tip">Chen et al. (2024). <em>Humans or LLMs as the Judge? A Study on Judgement Biases.</em></span></a>. This shows that, in niche domains, human review remains necessary to verify accuracy. However, it also verifies that, in niche domains, a general language model is insufficient to provide expert insight into a specific context, thereby confirming the need for more specific knowledge capture.</p>
+
+    <p>In disciplines where crowdsourcing expertise is difficult but expert review is still needed, LLM-as-a-judge methods have been developed to ensure the automated review is still valid<a class="cite" href="#ref-jiang2024">[<span class="ref-num">25</span>]<span class="tip">Jiang et al. (2024). <em>A Survey on LLM-as-a-Judge.</em></span></a><a class="cite" href="#ref-li2024">[<span class="ref-num">26</span>]<span class="tip">Li et al. (2024). <em>LLMs-as-Judges: A Comprehensive Survey on LLM-based Evaluation Methods.</em></span></a>. Multi-modal reasoning models are typically used to review designs, as the chain-of-thought reasoning has been shown to provide more reliable results<a class="cite" href="#ref-edwards2025">[<span class="ref-num">27</span>]<span class="tip">Edwards, Tehranchi, Miller &amp; Ahmed (2025). <em>AI Judges in Design.</em> ASME IDETC/CIE 2025.</span></a>. Known weaknesses like flattery, position, and verbosity biases can be mitigated with prompt engineering and randomized ordering<a class="cite" href="#ref-liu2023">[<span class="ref-num">28</span>]<span class="tip">Liu et al. (2023). <em>G-Eval: NLG Evaluation Using GPT-4 with Better Human Alignment.</em> EMNLP.</span></a>. To verify the LLM's accuracy, expert-grounded measurements such as gold standard comparisons, inter-rater reliability, equivalence testing, and top-set overlap are essential<a class="cite" href="#ref-edwards2025">[<span class="ref-num">27</span>]<span class="tip">Edwards et al. (2025).</span></a>.</p>
+
+    <p>Our work tackles a more complex task than previous research, as the data being reviewed is subjective and multifaceted. By testing multiple metadata and quality metrics, we gain insight on the ability of LLMs to review unstructured discourse data and understand semantic nuance. In domains where complex expert feedback is needed, LLM agreement has been shown to drop to 60–68%<a class="cite" href="#ref-szymanski2024">[<span class="ref-num">23</span>]<span class="tip">Szymanski et al. (2024).</span></a>; thus, human reviews are still essential for calibrating the automated review process. After the human-review validation step, automated quality control using LLMs is possible using gold standard and <span class="term" tabindex="0">in-context learning<span class="tip"><strong>In-context learning (ICL):</strong> teaching a language model a task by including examples in the prompt itself, without updating the model's weights.</span></span> techniques discussed in previous work. This validation process allows this dataset to be applied to interdisciplinary, AI-powered design-for-manufacturing interventions.</p>
+
+    <h3>Towards AI for knowledge augmentation in design</h3>
+    <p>Existing research on AI in design shows that AI functioning in a feedback-providing role gives the designer agency that translates to better outcomes<a class="cite" href="#ref-chong2023jmd">[<span class="ref-num">29</span>]<span class="tip">Chong, Raina, Goucher-Lambert, Kotovsky &amp; Cagan (2023). <em>The Evolution and Impact of Human Confidence in Artificial Intelligence.</em> JMD, 145(3).</span></a>. While much research has been conducted on AI's role in design and concept generation, there remains a significant opportunity for AI to grow in its role as a cognitive augmenter that enhances the designer's decision making<a class="cite" href="#ref-zhang2021">[<span class="ref-num">30</span>]<span class="tip">Zhang, Raina, Cagan &amp; McComb (2021). <em>A Cautionary Tale About the Impact of AI on Human Design Teams.</em> Design Studies, 72.</span></a><a class="cite" href="#ref-frich2024">[<span class="ref-num">31</span>]<span class="tip">Frich et al. (2024). <em>AI-Augmented Brainwriting: Investigating the Use of LLMs in Group Ideation.</em> CHI 2024.</span></a>.</p>
+
+    <p>DFM requires considering multiple external constraints with an expert level of detail, which uses extra cognitive load, which directly affects design performance<a class="cite" href="#ref-clemenlavrsen2024">[<span class="ref-num">32</span>]<span class="tip">Clemen Lavrsen &amp; Daalhuizen (2024). <em>Balancing Cognitive Load in Design Work.</em> DRS2024.</span></a><a class="cite" href="#ref-zimmerer2021">[<span class="ref-num">33</span>]<span class="tip">Zimmerer &amp; Matthiesen (2021). <em>Impact of Cognitive Load on Performance in Engineering Design.</em> Design Society.</span></a>. Early-stage design tasks like exploring the design space are already cognitively demanding, so extradisciplinary analysis must be done with caution as design problem spaces become more complex<a class="cite" href="#ref-sweller1988">[<span class="ref-num">34</span>]<span class="tip">Sweller (1988). <em>Cognitive Load During Problem Solving: Effects on Learning.</em> Cognitive Science, 12(2).</span></a>.</p>
+
+    <p>By supplying information and helping the designer reason over extradisciplinary knowledge that they would otherwise lack access to, future applications of this dataset can enable better early-stage design outcomes. Specifically, AI interventions have been shown to be particularly valuable when the task complexity exceeds what a designer can process by themselves<a class="cite" href="#ref-song2022">[<span class="ref-num">35</span>]<span class="tip">Song, Soria Zurita, Gyory et al. (2022). <em>When Faced with Increasing Complexity: The Effectiveness of AI Assistance for Drone Design.</em> JMD.</span></a>. Considering manufacturing constraints in mechanical design like material costs, setup time, and tool access is a clear example of this. Our work supports the augmentation of design through automated epistemological extraction and tacit knowledge synthesis.</p>
+
+    <p>Across the discussed research, no existing approach structures tacit manufacturing knowledge at scale from informal discourse, structures it for machine reasoning, and validates it through both expert and automated review. By adapting a computational knowledge-capture methodology to a high-demand discipline of design for manufacturing, this work contributes both a valuable knowledge base and structuring methodology. The applications and utility of this work are made clear by the recent research demonstrating the validity of LLM-as-a-judge and AI's role as a knowledge architect in product design<a class="cite" href="#ref-kernanfreire2024frontiers">[<span class="ref-num">36</span>]<span class="tip">Kernan Freire et al. (2024). <em>Knowledge Sharing in Manufacturing Using LLM-Powered Tools.</em> Frontiers in AI.</span></a><a class="cite" href="#ref-frontiers2026">[<span class="ref-num">37</span>]<span class="tip">Tsakalerou, Akhmadi, Balgynbayeva &amp; Kumisbek (2026). <em>AI-Assisted Design Synthesis and Human Creativity in Engineering Education.</em> Frontiers in AI.</span></a>.</p>
+  </div>
+</section>
+
+<!-- ================== § iv · Methodology ================== -->
+<section id="methodology" class="bay wider">
+  <div class="page">
+    <div class="section-mark">
+      <span class="section-num">§ iv</span>
+      <span class="section-title">Methodology</span>
+    </div>
+    <p>This section describes a four-stage pipeline for transforming unstructured online forum discourse into a structured, machine-queryable DFM knowledge base: <strong>(1)</strong> data collection and filtering, <strong>(2)</strong> knowledge frame extraction, <strong>(3)</strong> multi-vector embedding, and <strong>(4)</strong> knowledge graph construction. The pipeline, shown below, preserves the nuance of forum discourse while producing structured knowledge representations that an AI agent can reason over, in real time, during design tasks.</p>
+  </div>
+
+  <figure class="full fig-light">
+    <img src="images/pipeline.png" alt="Four-stage pipeline diagram: collection, frame extraction, embedding, graph construction" />
+    <figcaption><span class="fig-num">Fig. 1</span> Pipeline overview for extracting and structuring machinist knowledge into a queryable framework.</figcaption>
+  </figure>
+
+  <div class="page">
+    <h3>Data collection and filtering</h3>
+    <p>To collect the data, we scraped forum threads from <span class="term" tabindex="0">Stack Exchange<span class="tip"><strong>Stack Exchange:</strong> a network of question-and-answer websites including Stack Overflow, Engineering, Electronics, Robotics, and others. Public posts are licensed under Creative Commons Attribution–ShareAlike (CC BY-SA 4.0).</span></span>. Online forums have been shown to contain useful practitioner knowledge, with experienced users answering the majority of posted questions. The conversational nature of forums allows for more nuanced and context-dependent knowledge to be shared<a class="cite" href="#ref-panahi2013">[<span class="ref-num">38</span>]<span class="tip">Panahi, Watson &amp; Partridge (2013). <em>Towards Tacit Knowledge Sharing Over Social Web Tools.</em> J. Knowledge Management, 17(3).</span></a><a class="cite" href="#ref-arab2022">[<span class="ref-num">39</span>]<span class="tip">Arab, LaToza, Liang &amp; Ko (2022). <em>An Exploratory Study of Sharing Strategic Programming Knowledge.</em> CHI 2022.</span></a>. Forum data was collected via the Stack Exchange API under the platform's Creative Commons Attribution–ShareAlike (CC BY-SA 4.0) license, which permits reuse with attribution. No private or user-identifying information was collected beyond publicly displayed usernames and reputation scores.</p>
+
+    <p>Since there are a wide variety of conversations held on Stack Exchange, we developed a system to find the most relevant discussion threads. To capture both design-oriented posts and machining-process posts with potential design implications, a list of approximately <span class="num">20</span> keywords was developed spanning two complementary categories: keywords describing design decisions and constraints, and keywords describing machining problems or failure modes.</p>
+
+    <p>We ran searches with these keywords across five different Stack Exchange sites: Engineering, Mechanics, Woodworking, Electronics, and Robotics. With the Stack Exchange API, we scraped <span class="num">12,805</span> raw threads, each containing multiple posts. Using <code>GPT-5-mini</code> as a relevance filter, we removed questions that lacked relevant content, such as off-topic or non-technical discussion, and distilled the dataset to <span class="num">1,936</span> posts.</p>
+
+    <h3>Knowledge frame extraction</h3>
+    <p>To create the knowledge base, we developed a framework for extracting knowledge from the forum data. Raw forum posts have valuable lessons and insight, but in a format that is difficult for a machine to reason with. There is informal language, narrative structure, implicit assumptions, and high-context claims.</p>
+
+    <p>To take advantage of this richness in discourse, we introduce the concept of a <em>knowledge frame</em> — drawing on Minsky's frame representation paradigm<a class="cite" href="#ref-minsky1975">[<span class="ref-num">11</span>]<span class="tip">Minsky (1975). <em>A Framework for Representing Knowledge.</em></span></a> — defined as one distinct unit of design or manufacturing knowledge that is extracted from a post by an LLM with reasoning capabilities. Each post often contains knowledge from which multiple different frames can be extracted. For example, a machinist recounting a story of a build failure could include universal lessons, case-based observations, and clever workarounds in one post.</p>
+  </div>
+
+  <figure class="wide fig-light">
+    <img src="images/kg-architecture.png" alt="Knowledge graph architecture flowchart" />
+    <figcaption><span class="fig-num">Fig. 2</span> Knowledge graph architecture flowchart.</figcaption>
+  </figure>
+
+  <div class="page">
+    <p>A <span class="num">23</span>-field schema was developed for each frame. We developed the schema iteratively based on existing research on structuring knowledge<a class="cite" href="#ref-fillmore1982">[<span class="ref-num">40</span>]<span class="tip">Fillmore (1982). <em>Frame Semantics,</em> in <em>Linguistics in the Morning Calm.</em> Hanshin.</span></a><a class="cite" href="#ref-hyland1998">[<span class="ref-num">41</span>]<span class="tip">Hyland (1998). <em>Hedging in Scientific Research Articles.</em> John Benjamins.</span></a><a class="cite" href="#ref-toulmin1958">[<span class="ref-num">42</span>]<span class="tip">Toulmin (1958). <em>The Uses of Argument.</em> Cambridge University Press.</span></a>, with a focus on preserving nuance by separating the different semantic qualities of each knowledge claim. The schema served to both constrain the LLM's extraction output and structure the required metadata for future analysis. The fields were intentionally structured to capture various knowledge facets.</p>
+
+    <p>The <code>frame_type</code> classifies what type of claim the frame is making, while the <code>post_role</code> classifies the post's main purpose in the discussion and the <span class="term" tabindex="0"><code>epistemic_stance</code><span class="tip"><strong>Epistemic stance:</strong> how confidently a claim is stated — ranging from <em>absolute_authoritative</em>, <em>direct_neutral</em>, and <em>hedged_emphatic</em> through <em>tentative_subjective</em> to <em>narrative_implied</em>.</span></span> classifies how the post author views the claim being made. These fields help the LLM classify the frame and guide the <code>main_point</code> field, which captures the crux of the frame. The <code>scope</code>, <code>subject</code>, and <code>applicability</code> fields force the LLM to specify where the frame is useful. To force a separation between hypothetical values and discrete heuristics, the <code>example_value</code> and <code>example_context</code> fields have targeted prompts. Finally, the <code>extraction_rationale</code> contains any extra reasoning for the LLM to explain a potentially confusing frame classification.</p>
+
+    <p>When prompting the LLM, we used a few-shot approach, embedding examples for each schema field individually. Our prompt encouraged the LLM to extract multiple frames per post to prevent the LLM from collapsing a multi-faceted statement into only a single frame. After this, there was a multi-part filtering step.</p>
+
+    <p>The first filtering step used few-shot prompting to check the <code>epistemic_stance</code> field. This field is particularly important for categorizing the credibility and nature of the frame, and additional steps were required to ensure that the nuance of implicit communication was accurately captured. The second filtering step analyzed the <code>source_quote</code> field to determine whether duplicate frames were extracted. Any frames with similar quote citations were reanalyzed, with the LLM deciding whether to merge the frames, keep both frames, or delete one of them. Any frames with inaccurate <code>source_quote</code>s were deleted, and if a post was flagged for relevant content but no frames were extracted, the system was instructed to retry extraction.</p>
+
+    <p>Before using the schema for full frame extraction, we iterated on the schema and extraction scripts. Out of a total <span class="num">192</span> iterations, there were <span class="num">56</span> human iterations and <span class="num">136</span> LLM iterations on the code set. For the human iterations, we manually reviewed the extraction results from a set of diverse test frames. Based on the results, we adjusted the schema and extraction script to better capture the knowledge in the post. For the LLM iterations, we applied LLM-as-a-judge evaluation methods for each iteration. We used GPT-5 to assess the schema and extraction script alongside the post and its extractions, and instructed it to make direct, surgical changes to the scripts before iterating again.</p>
+
+    <p>The LLM-as-a-judge iteration involved in-context learning (ICL) based on gold-standard examples, which helped schema convergence. After converging on a schema that could successfully extract frames from posts in multiple different design or manufacturing disciplines, we executed the full extraction. Out of the <span class="num">1,936</span> posts, <span class="num">1,203</span> posts had relevant content and <span class="num">3,879</span> frames were extracted, with an average of <span class="num">3.22</span> frames per post.</p>
+
+    <h3>Validation</h3>
+    <p>To ensure quality of frames, we used an automated LLM pipeline to review the frames' quality and revise them as necessary. Following the methods discussed in Section&nbsp;<a href="#related-work">iii</a>, we conducted human review of the frames, with three engineering experts reviewing <span class="num">26</span> randomly sampled frames. The frames were reviewed for multiple metrics, including clarity, accuracy, and applicability. The reviewers also rated how tacit the extracted knowledge was, which is inversely related to how easily the knowledge could be found through simply reading a textbook. Each of the <span class="num">26</span> frames was given <span class="num">9</span> quantitative ratings and one qualitative rating (keep / revise / remove). Given the complex context of each frame and its rating, fewer frames were selected to minimize reviewer fatigue and meet scheduling constraints. Each reviewer made <span class="num">244</span> qualitative ratings.</p>
+
+    <p>Once this gold standard was established, we created a rubric-based prompting structure to have GPT-5 review each frame and apply the qualitative rating. This forced the LLM to decompose the evaluation into discrete criteria. Using the gold standard, we implemented in-context learning. Once each frame had a rating, the next prompting script executed each command, revising and removing the required frames. This separation of the judgement and generation steps in the LLM aligns with recommendations from existing research<a class="cite" href="#ref-zheng2023">[<span class="ref-num">22</span>]<span class="tip">Zheng et al. (2023).</span></a><a class="cite" href="#ref-li2024">[<span class="ref-num">26</span>]<span class="tip">Li et al. (2024).</span></a>. Since reviewing natural language knowledge extraction data is a subjective task, especially for tacit knowledge, we focused on the overall levels of harshness exhibited by the human reviews. Harsher reviews required more textbook-like and universal principles, and lenient reviews were more flexible with anecdotal and context-specific insights. Using the human review data, we calibrated the LLM's harshness and grading habits to match that of the experts.</p>
+
+    <h3>Multi-vector embedding</h3>
+    <p>Once the frames were extracted, a 3-vector <span class="term" tabindex="0">embedded space<span class="tip"><strong>Embedding:</strong> a numerical vector that represents the semantic meaning of text. Similar texts produce vectors that are close together in the embedding space, enabling similarity search that does not rely on exact keywords.</span></span> was constructed using OpenAI's <code>text-embedding-3-large</code> model (<span class="num">3,072</span> dimensions). The first vector embeds the extracted knowledge content, pulling from the subject, main point, example context, example value and thread context. This supports semantic retrieval for DFM knowledge and advice, enabling the most relevant knowledge to be found, independent of how it was communicated by the author of the original post. The second vector was based entirely on the source quote, to capture the semantic meaning of the natural language used by the author based on linguistic similarity. This helps with queries phrased with jargon or informal speech. The third vector is an auxiliary metadata vector, based on the metadata rendered as natural language which includes: <code>frame_type</code>, <code>scope</code>, <code>epistemic_stance</code>, and <code>post_role</code>. This supports property-based querying of frames, especially queries based on knowledge type.</p>
+
+    <p>A script that supports single-vector and multi-vector search was built and used to test this embedded space. Alongside this, we used topic modeling with <span class="term" tabindex="0">BERTopic<span class="tip"><strong>BERTopic:</strong> a topic-modeling tool that uses contextual embeddings and clustering to discover recurring themes in unstructured text — no need to predefine the number of topics.</span></span><a class="cite" href="#ref-grootendorst2022">[<span class="ref-num">43</span>]<span class="tip">Grootendorst (2022). <em>BERTopic: Neural Topic Modeling with a Class-Based TF-IDF Procedure.</em></span></a> to surface overarching themes and recurring subjects from the data. Using the existing embedding space, we used a <span class="term" tabindex="0">UMAP<span class="tip"><strong>UMAP (Uniform Manifold Approximation and Projection):</strong> a technique for projecting high-dimensional data into a lower-dimensional space (often 2D) for visualization and clustering, preserving both local and global structure.</span></span><a class="cite" href="#ref-mcinnes2018">[<span class="ref-num">44</span>]<span class="tip">McInnes, Healy &amp; Melville (2018). <em>UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction.</em></span></a> reduction to reduce the <span class="num">3,072</span>-dimension vector space to <span class="num">5</span> dimensions, with <code>n_neighbors = 15</code>. In this 5-dimension space, we used <span class="term" tabindex="0">HDBSCAN<span class="tip"><strong>HDBSCAN:</strong> Hierarchical Density-Based Spatial Clustering of Applications with Noise. A density-based clustering algorithm that groups points into clusters without requiring the number of clusters to be specified in advance.</span></span><a class="cite" href="#ref-mcinnes2017">[<span class="ref-num">45</span>]<span class="tip">McInnes, Healy &amp; Astels (2017). <em>hdbscan: Hierarchical Density Based Clustering.</em> JOSS, 2(11).</span></a> to find <span class="num">319</span> topic clusters based on density. These topics were reduced to <span class="num">39</span> larger clusters using BERTopic's hierarchical topic reduction. For easier visualization, these <span class="num">39</span> topics were grouped into <span class="num">8</span> high-level groups. These groupings could then be compared with the predetermined scope definitions set for the frames for further analysis.</p>
+
+    <h3>Knowledge graph construction</h3>
+    <p>Finally, a knowledge graph was constructed to capture the structure of the online discourse and the semantic relations between related frames. At first, we built a <span class="term" tabindex="0">provenance graph<span class="tip"><strong>Provenance graph:</strong> a graph that tracks where each piece of data came from — which post, thread, and author — so any claim can be traced back to its source.</span></span> with <code>AUTHOR</code>, <code>THREAD</code>, <code>POST</code> and <code>FRAME</code> as node types, and <code>THREAD_CONTAINS_POST</code>, <code>POST_AUTHORED_BY</code>, <code>POST_CONTAINS_FRAME</code>, and <code>SE_ANSWERS</code> as edge types. This part of the graph captures the discourse structure and shows human connections between different threads.</p>
+
+    <p>To construct the semantic portion of the graph, we found the top <span class="num">5</span> nearest neighbors of each frame in the embedded space (based on all 3 vectors). For each unique pair found, GPT-5 inferred semantic relationships between the frames that had relevant content<a class="cite" href="#ref-pan2024">[<span class="ref-num">14</span>]<span class="tip">Pan et al. (2024).</span></a>:</p>
+
+    <div class="predicates">
+      <div class="predicate">
+        <span class="predicate-name">SPECIFIES</span>
+        <p class="predicate-desc">One frame adds detail or constraints to another.</p>
+      </div>
+      <div class="predicate">
+        <span class="predicate-name">MITIGATES</span>
+        <p class="predicate-desc">One frame (typically a heuristic or workaround) addresses a risk described in another.</p>
+      </div>
+      <div class="predicate">
+        <span class="predicate-name">CAUSAL_LINK</span>
+        <p class="predicate-desc">Two frames share a cause–effect relationship.</p>
+      </div>
+      <div class="predicate">
+        <span class="predicate-name">CONTRADICTS</span>
+        <p class="predicate-desc">Two frames present conflicting claims.</p>
+      </div>
+    </div>
+
+    <p>Unrelated node pairs had no edge drawn. This inference process added another <span class="num">4,372</span> semantic edges. All nodes and edges were merged into a unified <span class="term" tabindex="0">Neo4j<span class="tip"><strong>Neo4j:</strong> a graph database that stores nodes and edges natively, enabling fast traversal of relationship-heavy data.</span></span> knowledge graph.</p>
+  </div>
+</section>
+
+<!-- ================== § v · Results ================== -->
+<section id="results" class="bay wider">
+  <div class="page">
+    <div class="section-mark">
+      <span class="section-num">§ v</span>
+      <span class="section-title">Results and evaluation</span>
+    </div>
+    <p>This section presents the results of the knowledge extraction process, both through quantitative metrics and qualitative discussion. We first discuss the data validation results. This is followed by a discussion of the metadata, primary data outputs, and opportunities for future work.</p>
+
+    <dl class="stats">
+      <div><span class="stat-num">12,805</span><span class="stat-label">threads<br/>collected</span></div>
+      <div><span class="stat-num">1,936</span><span class="stat-label">posts<br/>retained</span></div>
+      <div><span class="stat-num">3,879</span><span class="stat-label">frames<br/>extracted</span></div>
+      <div><span class="stat-num">1,138</span><span class="stat-label">unique<br/>authors</span></div>
+      <div><span class="stat-num">7,864</span><span class="stat-label">graph<br/>nodes</span></div>
+      <div><span class="stat-num">4,372</span><span class="stat-label">semantic<br/>edges</span></div>
+    </dl>
+
+    <h3>Dataset characteristics</h3>
+    <p>To address <strong>RQ1</strong>, we examine the distribution of knowledge types across the extracted frames. Across the different frame types and topics, the vast majority of the frames were <em>heuristic</em> (<span class="num">1,401</span>/<span class="num">3,879</span>) and <em>observation</em> (<span class="num">1,345</span>/<span class="num">3,879</span>). This aligns with the typical function of forum posts, in which users focus on providing advice, solving problems, or identifying relevant information<a class="cite" href="#ref-mamykina2011">[<span class="ref-num">10</span>]<span class="tip">Mamykina et al. (2011).</span></a>. By predetermined scope, the largest category was <em>design geometry</em>, which confirms the large presence of useful design information in engineering forums. Besides the "other" category, <em>machining process</em> and <em>machine capability</em> were the second and third largest categories, respectively. Full details of the frame metadata distributions are provided in <a href="#appendix-a">Appendix A</a>.</p>
+
+    <p>Our first output from this frame dataset was a multi-vector embedded space. The UMAP visualization, shown below, demonstrates the difference between the predetermined and clustered topic models. The clustered topics show a clearer distinction along zones of semantic similarity, while the predetermined topics are more intermixed. The predetermined topics, while an example of common fields of consideration in DFM, do not effectively organize the discussion threads and frames as the topic clusters do. An example of this is the tooling and machining process topics, whose centroids on the graph are relatively close. This pattern is understandable, as manufacturing problems and solutions often involve multiple subdisciplines. The clustered topics focus more on specific activities or skills, which differs from the predetermined topics' emphasis on areas of analysis. While textbooks and reports may organize information more similarly to the predetermined topics, an adaptive classification approach is better for organization when looking at unstructured data.</p>
+  </div>
+
+  <div class="page page-wide">
+    <div class="fig-pair">
+      <figure class="fig-light">
+        <img src="images/umap-scope.png" alt="UMAP scatter plot colored by predetermined scope categories" />
+        <figcaption><span class="fig-num">Fig. 3a</span> UMAP projection of the embedded space, colored by predetermined scope categories.</figcaption>
+      </figure>
+      <figure class="fig-light">
+        <img src="images/umap-topic.png" alt="UMAP scatter plot colored by BERTopic clusters" />
+        <figcaption><span class="fig-num">Fig. 3b</span> Same projection, colored by BERTopic clusters.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="page">
+    <p>Our second output was a knowledge graph, fully visualized in <a href="#appendix-a">Appendix A</a>. This contains the full structure of both the forum discourse and the semantic connections between frames. The majority of the nodes in the graph are connected, but there are several isolated groups of nodes with no connections to the central cluster. These signify discussions that are within the discipline of design for machining, but are not connected to the larger body of discussion. This illustrates the diverse nature of forum posts, where multiple unrelated discussions about similar topics are hosted on the same platform. The benefit of combining the knowledge graph with the embedded space is that, even if the user navigates a smaller, disconnected cluster, they can still search a wider area in the embedded space. This also works with AI agents, which can traverse the graph and the embedded space to retrieve the most relevant knowledge.</p>
+
+    <p>These results address <strong>RQ2</strong>: the combination of multi-vector embedding and a semantic knowledge graph preserves both the topical content and the relational structure of forum discourse. The three embedding vectors capture different facets (knowledge content, linguistic style, metadata), while the four semantic edge types (<code>SPECIFIES</code>, <code>MITIGATES</code>, <code>CAUSAL_LINK</code>, <code>CONTRADICTS</code>) encode reasoning relationships that flat text storage would lose.</p>
+  </div>
+
+  <div class="page page-wide">
+    <div class="fig-pair">
+      <figure class="fig-seamless">
+        <img src="images/graph-all.png" alt="Full knowledge graph with all nodes and edges" />
+        <figcaption><span class="fig-num">Fig. 4a</span> The complete knowledge graph — all <span class="num">7,864</span> nodes and <span class="num">13,148</span> edges.</figcaption>
+      </figure>
+      <figure class="fig-seamless">
+        <img src="images/graph-frames.png" alt="Frames-only subgraph with nodes scaled by degree" />
+        <figcaption><span class="fig-num">Fig. 4b</span> Frames-only subgraph, nodes scaled by degree.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="page">
+    <h3>Knowledge frame validation</h3>
+    <p>The human review statistics of the <span class="num">26</span> unrevised, random-sampled frames are presented below. Due to the subjectivity of rating extracted knowledge, the <span class="term" tabindex="0">inter-rater reliability<span class="tip"><strong>Inter-rater reliability (IRR):</strong> a measure of how much multiple independent reviewers agree when rating the same items.</span></span> (IRR) varied between metrics. This is understandable, as each human rater approached the same knowledge from a different subjective paradigm on design and manufacturing. However, the average scores on quality, clarity, and accuracy demonstrate the utility of the presented knowledge extraction strategy. Despite disagreements on the specific qualities that made the knowledge useful, the ratings show that each reviewer believed the knowledge was useful overall.</p>
+
+    <p>For each of the <span class="num">26</span> frames, there were ten qualitative ratings given by the reviewers. The metrics on extraction accuracy, clarity, and main point quality focus on the overall validity of the frame; these metrics were used to assess the frames' IRR. The metrics on scope, post role, epistemic stance, and applicability provide insight on the LLM's agreement with humans in classifying natural language data. In addition to this insight, these metadata metrics were used to calibrate the automated frame review and revision pipeline. Each of these metrics contained "poor," "acceptable," and "good" tiers. The tacit knowledge rating asked users to classify whether the knowledge communicated in the claim could be found in a traditional textbook. After the first <span class="num">9</span> qualitative ratings, the final rating for each frame asked the reviewers to recommend keeping, revising or removing each frame.</p>
+
+    <p>In analyzing the IRR of this grading scheme, we used <span class="term" tabindex="0">Gwet's AC1<span class="tip"><strong>Gwet's AC1:</strong> a statistical measure of agreement between raters. Unlike Cohen's kappa, it remains stable when most ratings fall into one category — avoiding the kappa paradox.</span></span><a class="cite" href="#ref-gwet2008">[<span class="ref-num">46</span>]<span class="tip">Gwet (2008). <em>Computing Inter-Rater Reliability and Its Variance in the Presence of High Agreement.</em> British J. Math. Stat. Psychology, 61(1).</span></a> to measure agreement in place of the alpha and kappa metrics used in past papers. Because of the vast majority of ratings being in the "good" category, the kappa and alpha ratings understate agreement — a well-documented statistical artifact known as the <span class="term" tabindex="0">kappa paradox<span class="tip"><strong>Kappa paradox:</strong> a statistical artifact where Cohen's kappa reports near-zero or even negative agreement even when raters actually agree on almost everything — caused by uneven prevalence across rating categories.</span></span><a class="cite" href="#ref-feinstein1990">[<span class="ref-num">47</span>]<span class="tip">Feinstein &amp; Cicchetti (1990). <em>High Agreement but Low Kappa: I. The Problems of Two Paradoxes.</em> J. Clinical Epidemiology, 43(6).</span></a>. The perceived randomness of agreement in a rating where one category dominates makes the high agreement of this data seem by chance. For example, since 83–100% of ratings were viewed as "good," the 96% exact agreement on main point quality is actually shown as negative by the Fleiss kappa rating. However, the only way to get a higher rating for that measurement would have been perfect agreement. The three ratings used to measure frame quality had high agreement and high average quality ratings:</p>
+
+    <table class="data-table">
+      <caption>Table 1 &middot; Frame quality ratings across human reviewers.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Dimension</th>
+          <th scope="col">Good</th>
+          <th scope="col">Accept</th>
+          <th scope="col">Unsat</th>
+          <th scope="col">Agree</th>
+          <th scope="col">AC1</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Extraction accuracy</th><td>92%</td><td>8%</td><td>0%</td><td>84%</td><td>0.840</td></tr>
+        <tr><th scope="row">Clarity</th><td>92%</td><td>6%</td><td>1%</td><td>85%</td><td>0.846</td></tr>
+        <tr><th scope="row">Main point quality</th><td>99%</td><td>1%</td><td>0%</td><td>96%</td><td>0.962</td></tr>
+      </tbody>
+    </table>
+
+    <p>Overall, the majority of the frames were rated highly, with a high percentage agreement and AC1 metrics. The keep / revise / remove ratings were also favorable, with <span class="num">0</span> out of <span class="num">26</span> frames being voted for removal, and <span class="num">5</span> frames being recommended for revision. Of the "revise" rated frames, the primary reasons were lack in clarity, and disagreements about metadata. When extracting frames, the LLM had the freedom to reference information from the overall post or original thread question, but was instructed only to reference specific quotes. After reviewing each of the "revise" rated frames criticized for clarity, we noticed that each of the frames were accurate, but referenced data outside the quoted post excerpt.</p>
+
+    <p>The metadata ratings were more contested, with lower agreement and average ratings. There was significant disagreement among reviewers on the accuracy of each metadata metric, showing the subjectivity of the classification method. While these metadata fields are not essential to the dataset, they can provide a helpful way to search and organize the frames. This insight informed our structuring of the dataset in the case study discussed below.</p>
+
+    <table class="data-table">
+      <caption>Table 2 &middot; Metadata classification ratings across human reviewers.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Dimension</th>
+          <th scope="col">Good</th>
+          <th scope="col">Accept</th>
+          <th scope="col">Unsat</th>
+          <th scope="col">Agree</th>
+          <th scope="col">AC1</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Scope</th><td>90%</td><td>9%</td><td>1%</td><td>81%</td><td>0.808</td></tr>
+        <tr><th scope="row">Post role</th><td>88%</td><td>8%</td><td>4%</td><td>73%</td><td>0.712</td></tr>
+        <tr><th scope="row">Epistemic stance</th><td>88%</td><td>5%</td><td>6%</td><td>69%</td><td>0.673</td></tr>
+        <tr><th scope="row">Applicability</th><td>86%</td><td>10%</td><td>4%</td><td>58%</td><td>0.577</td></tr>
+        <tr><th scope="row">Frame type</th><td>77%</td><td>18%</td><td>5%</td><td>50%</td><td>0.500</td></tr>
+      </tbody>
+    </table>
+
+    <p>The tacit knowledge rating showed an average of <strong><span class="num">71%</span> of frames</strong> to contain tacit or expert-level knowledge, with strong disagreement among reviewers about which frames were truly non-textbook. This confirms the nature of tacit and expert-level engineering knowledge — the perception and possession of it changes across different experts and sources<a class="cite" href="#ref-nonaka1995">[<span class="ref-num">7</span>]<span class="tip">Nonaka &amp; Takeuchi (1995).</span></a><a class="cite" href="#ref-sun2024">[<span class="ref-num">8</span>]<span class="tip">Sun et al. (2024).</span></a>. The tacit knowledge rating also showed that, while a significant portion of the extracted knowledge was tacit, there is still a strong presence of textbook information communicated in the forums.</p>
+
+    <p>Overall, the LLM was more conservative on content and tacit knowledge rating, but more generous on the metadata ratings. In general, we found that the LLM was a harsher critic of the quality of knowledge extracted. The LLM only found more agreement with human ratings once the gold standard demonstrating the tacit knowledge's usefulness was implemented. This produces an insight that LLMs might naturally discount tacit and experiential knowledge in favor of more structured or formal knowledge<a class="cite" href="#ref-chen2024">[<span class="ref-num">24</span>]<span class="tip">Chen et al. (2024).</span></a><a class="cite" href="#ref-szymanski2024">[<span class="ref-num">23</span>]<span class="tip">Szymanski et al. (2024).</span></a>. Similarly, the lower <code>tacit_knowledge</code> rating given by the LLM shows that it tends to default to textbook knowledge for concepts that human reviewers might view as more tacit.</p>
+
+    <p>The expert review of the frames provided helpful calibration for the automated LLM rating and revision pipeline. Of the <span class="num">3,879</span> frames reviewed, <span class="num">20%</span> were marked for revision, with only <span class="num">3</span> frames marked for removal. To address <strong>RQ3</strong>, we find that automated LLM review is feasible for frame quality assessment (AC1 ≥ <span class="num">0.84</span> on quality metrics) but requires human calibration for subjective dimensions like tacit knowledge classification. In total, the knowledge extraction process resulted in <span class="num">3,879</span> frames, which created a corresponding embedded space and semantic knowledge graph with <span class="num">4,372</span> semantic edges. The total graph with both semantic connections and discourse provenance contained <span class="num">7,864</span> nodes and <span class="num">13,148</span> edges.</p>
+
+    <h3>Case study: agentic retrieval</h3>
+    <p>To demonstrate the usefulness of this knowledge, we use the frame embeddings in a retrieval system. By constructing an agentic <span class="term" tabindex="0">retrieval-augmented generation<span class="tip"><strong>Retrieval-Augmented Generation (RAG):</strong> a technique where a language model retrieves relevant external documents before answering, grounding its output in source material rather than relying only on its training data.</span></span> (RAG) system<a class="cite" href="#ref-lewis2020">[<span class="ref-num">13</span>]<span class="tip">Lewis et al. (2020).</span></a>, we enable a more concrete connection between design advice and experiential commentary. In response to design queries, this agent retrieves vectors, traverses the knowledge graph, synthesizes a response, and identifies gaps in the knowledge base.</p>
+
+    <p>When making a query, the user can adjust three parameters to adjust the scope of knowledge retrieval: <em>N</em>, <em>M</em>, and <em>Q</em>. With every query, the model retrieves the <em>N</em> nearest frames, retrieves any semantically connected nodes within <em>M</em> degrees of removal, and down-selects to <em>Q</em> total frames. Based on these frames, it synthesizes a query response, detailed in Table&nbsp;3, and identifies gaps where the available frames do not provide coverage. The model defaults to a concise response, only listing the reference frame IDs, but the user can easily access details on the frame citations.</p>
+
+    <p>If the user doubts the advice, they can request the context of the discourse behind the frames. In response to this query, the model accesses the provenance graph, and retrieves the structure of the discussions behind each frame, including the author names, author credibility scores, and complete thread content for each of the frames used as evidence. The agent then uses this data to provide a summary of the existing context.</p>
+
+    <p>If the user requires information not covered in the available frames, they can request for the model to backfill the identified knowledge gaps with information from textbooks or official standard codes. This application demonstrates that datasets like this can augment the existing capabilities of language models to search for information with specific data on a complex discipline<a class="cite" href="#ref-pan2024">[<span class="ref-num">14</span>]<span class="tip">Pan et al. (2024).</span></a><a class="cite" href="#ref-gao2025drknows">[<span class="ref-num">48</span>]<span class="tip">Gao et al. (2025). <em>Leveraging Medical Knowledge Graphs Into Large Language Models for Diagnosis Prediction.</em> JMIR AI, 4.</span></a>. When compared to a typical LLM response to the same design question, this agent provides a more detailed and grounded response, where there is a clear human link to each response provided. Furthermore, the textbook answers being incorporated into the knowledge gaps enable a comprehensive response. Using agentic retrieval, the best aspects of both general LLM searches and specific graph queries can be combined to provide useful insight. More details on the agent's reasoning process and output can be found in <a href="#appendix-b">Appendix B</a>.</p>
+
+    <table class="data-table">
+      <caption>Table 3 &middot; Structure of a synthesized DFM agent response.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Section</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Summary</th><td>Concise overview of DFM advice from all retrieved frames.</td></tr>
+        <tr><th scope="row">Discipline sections</th><td>Categorizes retrieved knowledge into specific engineering domains (e.g., machining, materials).</td></tr>
+        <tr><th scope="row">&nbsp;&nbsp;→ Evidence</th><td>Sourced claims citing specific frame IDs.</td></tr>
+        <tr><th scope="row">&nbsp;&nbsp;→ Reasoning chains</th><td>Sequences of frames linked by semantic edges (<em>causal</em>, <em>mitigates</em>, <em>specifies</em>).</td></tr>
+        <tr><th scope="row">&nbsp;&nbsp;→ First principles</th><td>Governing physics, scaling rules, and engineering rationale.</td></tr>
+        <tr><th scope="row">&nbsp;&nbsp;→ Formulas</th><td>Relevant equations with variable definitions and notes.</td></tr>
+        <tr><th scope="row">Design rules</th><td>Actionable guidance for the designer at the CAD / drawing stage, citing frame IDs.</td></tr>
+        <tr><th scope="row">Contradictions</th><td>Cases where two frames provide opposing guidance, presented without resolution.</td></tr>
+        <tr><th scope="row">Knowledge gaps</th><td>Specific aspects of the user query not covered by the retrieved frames.</td></tr>
+        <tr><th scope="row">Gap backfill</th><td>Textbook-level answers for gaps, with confidence notes and standards references.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================== § vi · Discussion ================== -->
+<section id="discussion" class="bay">
+  <div class="page">
+    <div class="section-mark">
+      <span class="section-num">§ vi</span>
+      <span class="section-title">Discussion</span>
+    </div>
+
+    <h3>Contextualizing the contributions</h3>
+    <p>This paper contributes a dataset with diverse knowledge claims and a reasoning-prone structure. The method of knowledge collection is a secondary contribution in that it explores the structuring of insight from unstructured discourse data. In collecting this data, we found that reviewing the quality of tacit and experiential knowledge extraction is a more subjective task than other common applications of automated LLM review<a class="cite" href="#ref-liu2023">[<span class="ref-num">28</span>]<span class="tip">Liu et al. (2023).</span></a><a class="cite" href="#ref-kernanfreire2024frontiers">[<span class="ref-num">36</span>]<span class="tip">Kernan Freire et al. (2024).</span></a><a class="cite" href="#ref-frich2024">[<span class="ref-num">31</span>]<span class="tip">Frich et al. (2024).</span></a>. To overcome this, we calibrate our automated review using similar techniques to past work, but with a different measurement of IRR and a more multifaceted rubric.</p>
+
+    <p>Similar work on automated review in expert domains shows 60–68% review agreement; while the ratings on frame quality exceed this, ratings on the metadata are both above and below this range<a class="cite" href="#ref-szymanski2024">[<span class="ref-num">23</span>]<span class="tip">Szymanski et al. (2024).</span></a>. This shows that assessing the usefulness of tacit and experiential insights is a more reliable task than the classification of those insights. This is especially evident when reviewing how tacit a knowledge frame is; the boundary between textbook and tacit depends on the education and experiential knowledge of the reviewer. Additionally, the LLM defaulted to discounting experiential knowledge in favor of more structured or formal representations.</p>
+
+    <p>Comparable work on distilling design knowledge used product teardowns, product recalls, 3D CAD files, patents, and other structured documents<a class="cite" href="#ref-bolanos2025">[<span class="ref-num">21</span>]<span class="tip">Bolanos et al. (2025).</span></a><a class="cite" href="#ref-goridkov2023jmd">[<span class="ref-num">20</span>]<span class="tip">Goridkov et al. (2023).</span></a><a class="cite" href="#ref-jia2024">[<span class="ref-num">18</span>]<span class="tip">Jia et al. (2024).</span></a><a class="cite" href="#ref-sarica2020">[<span class="ref-num">15</span>]<span class="tip">Sarica et al. (2020).</span></a>. By using forum posts as the data source, our work creates a more diverse knowledge base in DFM. The knowledge types contained in our dataset, like observations, contradictions, workarounds and heuristics are not found in existing datasets. Additionally, the scale of the experiential knowledge captured expands upon past work in this area<a class="cite" href="#ref-goridkov2023jmd">[<span class="ref-num">20</span>]<span class="tip">Goridkov et al. (2023).</span></a>. In analyzing the output, we learned about the differences in classification outcomes of two topic modeling approaches: predetermined fields, and retroactively topic modeled clusters. While traditional categories along concrete dimensions of analysis are useful in some contexts, focusing on activities and skills is more aligned with how discourse is structured. We also learned that while a large portion of the dataset is connected structurally and semantically, many nodes are not connected to the main knowledge cluster. In the case study, we combine knowledge graph traversal with RAG to avoid missing relevant but disconnected frames. This application demonstrates the usefulness of this knowledge graph in informing design choices from multiple angles.</p>
+
+    <p>The dataset's topic distribution shows that design geometry, machining processes and machine capabilities are the topics with the highest density in questions asked, and that practical heuristics and empirical observations are the most common forms of knowledge shared in these forums. This helps the DFM process in a way that traditional rule-based processes do not. Furthermore, the <code>CONTRADICTS</code> semantic edges provide a look into areas where practitioners disagree, which also provides nuance that traditional textbooks and automated DFM checks do not. Finally, the graph's structure enables each knowledge frame to be directly linked to a concrete human experience or perspective, which is useful for verification.</p>
+
+    <h3>Opportunities for AI knowledge augmentation in design</h3>
+    <p>For designers, this work shows that design feedback based on human expertise and experience can be retrieved computationally. Designers can find feedback that is both detailed and practical before consulting an external manufacturing expert, whether through manual search or agentic retrieval. In complex technical fields such as design, experts make decisions and generate ideas using a large internal base of tacit and experiential knowledge. As shown by this dataset, much of that knowledge is context dependent, and some of it is contested between different perspectives. AI can provide assistance in navigating and understanding this knowledge and has been shown to be useful in generating feasible but less diverse concepts<a class="cite" href="#ref-ma2025diverse">[<span class="ref-num">49</span>]<span class="tip">Ma, Grandi, McComb &amp; Goucher-Lambert (2025). <em>Do Large Language Models Produce Diverse Design Concepts?</em> JCISE, 25(2).</span></a>. Nonetheless, maintaining agency in the designer is important as intelligent digital tools continue to grow in number and capability. Thus, a paradigm where AI is a sensemaker that surfaces and interprets knowledge for the user allows for more constraint-aware technical decision making and idea generation.</p>
+
+    <blockquote class="pullquote">
+      An intentional choice in this work is that the knowledge graph and example agentic applications do not generate concepts.
+      <cite>§ vi &middot; Opportunities</cite>
+    </blockquote>
+
+    <p>The knowledge graph helps the agent surface relevant knowledge in response to queries, preserving the designer's role in creating and refining concepts. Recent empirical research shows that generative AI in concept design can result in premature convergence compared to human-only teams, where fewer alternatives are explored and functional quality is lower<a class="cite" href="#ref-frontiers2026">[<span class="ref-num">37</span>]<span class="tip">Tsakalerou et al. (2026).</span></a>. Other work shows that access to generative AI increases individual creativity at the cost of collective output diversity<a class="cite" href="#ref-doshi2024">[<span class="ref-num">50</span>]<span class="tip">Doshi &amp; Hauser (2024). <em>Generative AI Enhances Individual Creativity but Reduces the Collective Diversity of Novel Content.</em> Science Advances, 10(28).</span></a>. Thus, our work positions AI not as a generator, but as a collaborative advisor that surfaces experiential knowledge, flags contradictions between practitioners, and identifies gaps where no knowledge exists, while leaving creation to the designer.</p>
+
+    <p>A recent review draws parallels between human working memory limitations and LLM context windows<a class="cite" href="#ref-wang2026cogload">[<span class="ref-num">51</span>]<span class="tip">Wang, Liu, Zou &amp; Paas (2026). <em>Overloaded Minds and Machines: A Cognitive Load Framework for Human-AI Symbiosis.</em> AI Review, 59.</span></a>, showing that retrieval-augmented generation extends an LLM's effective knowledge in the same way that consulting an external expert extends a designer's effective knowledge. Agentic systems that perform research through techniques like RAG for the designer can enable multidisciplinary design perspectives while reducing the designer's cognitive load. This is consistent with findings that AI assistance maximizes value when task complexity exceeds the capacity of a single designer<a class="cite" href="#ref-song2022">[<span class="ref-num">35</span>]<span class="tip">Song et al. (2022).</span></a>.</p>
+
+    <h3>Limitations and future work</h3>
+    <p>This paper demonstrates the ability to extract structured knowledge from unstructured data. However, using forum posts as the only data source for the knowledge base provides some limitations. Expertise is not required to be active and influential on public online forums, which means claims made can vary greatly in validity and technical accuracy. In addition, the use of LLMs to extract knowledge frames provides another source of potential error, as reasoning models like GPT-5 do not always produce repeatable results. This was seen most in the metadata classifications.</p>
+
+    <p>Future work could improve these areas by combining extractions from multiple sources of data. Data from multiple discussion platforms can be used to expand the knowledge graph to enrich and broaden the knowledge base. In addition, augmenting this dataset with frames extracted from machining reports or manuals would allow for another layer of contextual knowledge in the graph. Even comparing extraction quality between models from different companies could provide insight into how LLM architecture affects automated analysis tasks.</p>
+
+    <p>These changes would enable future applications of the work to be more accurate and versatile. The presented examples of knowledge retrieval demonstrate the dataset's potential use, but real-world validation remains an open opportunity. By assessing changes in design outcomes when using this tool in academia and industry, information on the dataset's true utility can be found. Moreover, the effects of this automated DFM feedback on concept generation and selection could be analyzed. A study could examine the outcomes of both divergent and convergent concept design sessions with DFM intervention.</p>
+
+    <h3>Expanded applications</h3>
+    <p>Future work could also expand beyond the field of design. The pipeline demonstrated in this paper that translates informal conversation into a structured knowledge base can be applied to multiple disciplines beyond design for machining. This overarching knowledge extraction strategy is useful in contexts with these characteristics:</p>
+    <ol class="num-list">
+      <li>Large portions of expert knowledge in the discipline are undocumented, experiential, or tacit.</li>
+      <li>Discourse data such as meeting transcriptions, digital messages, or document comments are available.</li>
+      <li>A large population of practitioners requires expert knowledge to fulfill their roles.</li>
+    </ol>
+
+    <p style="margin-top:2rem;">Examples of this are broader engineering disciplines, such as analysis and testing. Finite-element analysis (FEA), for example, requires frequent engineering judgment calls on factors like mesh density, boundary conditions, diagnosing result accuracy, and troubleshooting. These decisions are often based on both textbook knowledge and experience. Senior analysts possess valuable knowledge of common modeling pitfalls that may not be found in a manual. Using this work to develop a machine-readable knowledge base for analysis could aid future simulation outcomes. Physical testing presents a similar pattern, where experienced test engineers make decisions about fixture design, sensor placement, and anomaly interpretation based on experiential knowledge that is typically transferred through mentorship rather than documentation<a class="cite" href="#ref-sun2024">[<span class="ref-num">8</span>]<span class="tip">Sun et al. (2024).</span></a><a class="cite" href="#ref-nonaka1995">[<span class="ref-num">7</span>]<span class="tip">Nonaka &amp; Takeuchi (1995).</span></a>.</p>
+
+    <p>Applications extend beyond engineering; healthcare and legal practice both involve large bodies of experiential knowledge that could benefit from structured extraction from informal discourse<a class="cite" href="#ref-gao2025drknows">[<span class="ref-num">48</span>]<span class="tip">Gao et al. (2025).</span></a><a class="cite" href="#ref-legaliesurvey2025">[<span class="ref-num">52</span>]<span class="tip">Ariai et al. (2025). <em>Natural Language Processing for the Legal Domain.</em> ACM Computing Surveys.</span></a>. However, these domains introduce additional constraints around patient privacy, attorney-client privilege, and regulatory requirements that future work must address.</p>
+  </div>
+</section>
+
+<!-- ================== § vii · Conclusion ================== -->
+<section id="conclusion" class="bay">
+  <div class="page">
+    <div class="section-mark">
+      <span class="section-num">§ vii</span>
+      <span class="section-title">Conclusion</span>
+    </div>
+    <p>This paper demonstrated a method for extracting, structuring, and validating tacit machining knowledge from online forum discourse. From <span class="num">1,936</span> posts by <span class="num">1,138</span> authors, we extracted <span class="num">3,879</span> knowledge frames organized into a multi-vector embedded space and a semantic knowledge graph. Human expert review confirmed the quality of the extractions, and an LLM-as-a-judge pipeline calibrated on expert ratings enabled automated quality control at scale. The agentic retrieval case study showed that structured tacit knowledge can augment LLM capabilities for design-for-manufacturing feedback<a class="cite" href="#ref-lewis2020">[<span class="ref-num">13</span>]<span class="tip">Lewis et al. (2020).</span></a><a class="cite" href="#ref-pan2024">[<span class="ref-num">14</span>]<span class="tip">Pan et al. (2024).</span></a>. By grounding AI in domain-specific experiential knowledge rather than general training data, this work contributes to a paradigm where AI expands the designer's cognitive bandwidth while preserving their creative agency<a class="cite" href="#ref-chong2023jmd">[<span class="ref-num">29</span>]<span class="tip">Chong et al. (2023).</span></a><a class="cite" href="#ref-zhang2021">[<span class="ref-num">30</span>]<span class="tip">Zhang et al. (2021).</span></a>.</p>
+  </div>
+</section>
+
+<!-- ================== § viii · Acknowledgments ================== -->
+<section id="acknowledgments" class="bay">
+  <div class="page">
+    <div class="section-mark">
+      <span class="section-num">§ viii</span>
+      <span class="section-title">Acknowledgments</span>
+    </div>
+    <p>This work has been supported by the Regents of the University of California. The findings presented in this work represent the views of the authors and not necessarily those of the sponsors.</p>
+  </div>
+</section>
+
+<!-- ================== § ix · References ================== -->
+<section id="references" class="bay">
+  <div class="page">
+    <div class="section-mark">
+      <span class="section-num">§ ix</span>
+      <span class="section-title">References</span>
+    </div>
+    <details class="expandable" open>
+      <summary><span class="summary-label">Show all references</span><span class="summary-count">52 works</span></summary>
+      <ol class="reflist">
+        <li id="ref-ehrlenspiel2007"><strong>Ehrlenspiel, K., Kiewert, A. &amp; Lindemann, U.</strong> (2007). <em>Cost-Efficient Design.</em> Ed. Hundal, M. S. ASME Press / Springer. <a href="https://doi.org/10.1007/978-3-540-34648-7">doi:10.1007/978-3-540-34648-7</a></li>
+        <li id="ref-boothroyd1994"><strong>Boothroyd, G., Dewhurst, P. &amp; Knight, W. A.</strong> (1994). <em>Product Design for Manufacture and Assembly.</em> Marcel Dekker.</li>
+        <li id="ref-chang2011"><strong>Chang, T.-C., Wysk, R. A. &amp; Wang, H.-P.</strong> (2006). <em>Computer-Aided Manufacturing,</em> 3rd ed. Prentice Hall.</li>
+        <li id="ref-odriscoll2002"><strong>O'Driscoll, M.</strong> (2002). Design for Manufacture. <em>Journal of Materials Processing Technology,</em> 122(2–3), 318–321. <a href="https://doi.org/10.1016/S0924-0136(01)01132-3">doi:10.1016/S0924-0136(01)01132-3</a></li>
+        <li id="ref-gupta1997"><strong>Gupta, S. K., Regli, W. C., Das, D. &amp; Nau, D. S.</strong> (1997). Automated Manufacturability Analysis: A Survey. <em>Research in Engineering Design,</em> 9(3), 168–190. <a href="https://doi.org/10.1007/BF01596601">doi:10.1007/BF01596601</a></li>
+        <li id="ref-formentini2022"><strong>Formentini, G., Rodriguez, N. B. &amp; Favi, C.</strong> (2022). Design for Manufacturing and Assembly Methods in the Product Development Process of Mechanical Products: A Systematic Literature Review. <em>International Journal of Advanced Manufacturing Technology,</em> 120, 4307–4334. <a href="https://doi.org/10.1007/s00170-022-08837-6">doi:10.1007/s00170-022-08837-6</a></li>
+        <li id="ref-nonaka1995"><strong>Nonaka, I. &amp; Takeuchi, H.</strong> (1995). <em>The Knowledge-Creating Company: How Japanese Companies Create the Dynamics of Innovation.</em> Oxford University Press.</li>
+        <li id="ref-sun2024"><strong>Sun, X., Huang, R., Jiang, Z., Lu, J. &amp; Yang, S.</strong> (2024). On Tacit Knowledge Management in Product Design: Status, Challenges, and Trends. <em>Journal of Engineering Design,</em> 35(1). <a href="https://doi.org/10.1080/09544828.2023.2301232">doi:10.1080/09544828.2023.2301232</a></li>
+        <li id="ref-deloitte2024"><strong>Deloitte &amp; The Manufacturing Institute.</strong> (2024). <em>Creating Pathways for Tomorrow's Workforce Today: Beyond Reskilling in Manufacturing.</em> Industry report.</li>
+        <li id="ref-mamykina2011"><strong>Mamykina, L., Manoim, B., Mittal, M., Hripcsak, G. &amp; Hartmann, B.</strong> (2011). Design Lessons from the Fastest Q&amp;A Site in the West. <em>Proceedings of CHI '11,</em> 2857–2866. <a href="https://doi.org/10.1145/1978942.1979366">doi:10.1145/1978942.1979366</a></li>
+        <li id="ref-minsky1975"><strong>Minsky, M.</strong> (1975). A Framework for Representing Knowledge. In <em>The Psychology of Computer Vision,</em> ed. Winston, P. H., pp. 211–277. McGraw-Hill.</li>
+        <li id="ref-tomiyama2009"><strong>Tomiyama, T., Gu, P., Jin, Y., Lutters, D., Kind, C. &amp; Kimura, F.</strong> (2009). Design Methodologies: Industrial and Educational Applications. <em>CIRP Annals,</em> 58(2), 543–565. <a href="https://doi.org/10.1016/j.cirp.2009.09.003">doi:10.1016/j.cirp.2009.09.003</a></li>
+        <li id="ref-lewis2020"><strong>Lewis, P. et al.</strong> (2020). Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. <em>Advances in Neural Information Processing Systems.</em> <a href="https://arxiv.org/abs/2005.11401">arXiv:2005.11401</a></li>
+        <li id="ref-pan2024"><strong>Pan, S., Luo, L., Wang, Y., Chen, C., Wang, J. &amp; Wu, X.</strong> (2024). Unifying Large Language Models and Knowledge Graphs: A Roadmap. <em>IEEE Transactions on Knowledge and Data Engineering,</em> 36(7), 3580–3599. <a href="https://doi.org/10.1109/TKDE.2024.3352100">doi:10.1109/TKDE.2024.3352100</a></li>
+        <li id="ref-sarica2020"><strong>Sarica, S., Luo, J. &amp; Wood, K. L.</strong> (2020). TechNet: Technology Semantic Network Based on Patent Data. <em>Expert Systems with Applications,</em> 142, 112995. <a href="https://doi.org/10.1016/j.eswa.2019.112995">doi:10.1016/j.eswa.2019.112995</a></li>
+        <li id="ref-fenoglio2022"><strong>Fenoglio, E., Kazim, E., Latapie, H. &amp; Koshiyama, A.</strong> (2022). Tacit Knowledge Elicitation Process for Industry 4.0. <em>Discover Artificial Intelligence,</em> 2(1). <a href="https://doi.org/10.1007/s44163-022-00020-w">doi:10.1007/s44163-022-00020-w</a></li>
+        <li id="ref-sanya2023"><strong>Sanya, R. &amp; Shehab, E.</strong> (2023). Towards a Knowledge Graph Framework for Ad Hoc Analysis in Manufacturing. <em>International Journal of Advanced Manufacturing Technology.</em> <a href="https://doi.org/10.1007/s10845-023-02319-6">doi:10.1007/s10845-023-02319-6</a></li>
+        <li id="ref-jia2024"><strong>Jia, J., Zhang, S. &amp; Saad, M.</strong> (2024). Knowledge Graph-Based Multi-Granularity Tacit Design Knowledge Reuse. <em>Journal of Computational Design and Engineering,</em> 12(1). <a href="https://doi.org/10.1093/jcde/qwae108">doi:10.1093/jcde/qwae108</a></li>
+        <li id="ref-kernanfreire2023chi"><strong>Kernan Freire, S. et al.</strong> (2023). Tacit Knowledge Elicitation for Shop-Floor Workers with an Intelligent Assistant. <em>Extended Abstracts of CHI 2023.</em> <a href="https://doi.org/10.1145/3544549.3585755">doi:10.1145/3544549.3585755</a></li>
+        <li id="ref-goridkov2023jmd"><strong>Goridkov, N., Rao, V., Cui, D., Grandi, D., Wang, Y. &amp; Goucher-Lambert, K.</strong> (2023). Embedding Experiential Design Knowledge in Interactive Knowledge Graphs. <em>Journal of Mechanical Design,</em> 145(4), 041412. <a href="https://doi.org/10.1115/1.4056347">doi:10.1115/1.4056347</a></li>
+        <li id="ref-bolanos2025"><strong>Bolanos, D., Ataei, M., Grandi, D. &amp; Goucher-Lambert, K.</strong> (2025). RECALL-MM: A Multimodal Dataset of Consumer Product Recalls for Risk Analysis Using Computational Methods and Large Language Models. <em>Proceedings of ASME IDETC/CIE 2025,</em> DETC2025-169712.</li>
+        <li id="ref-zheng2023"><strong>Zheng, L. et al.</strong> (2023). Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena. <em>Advances in Neural Information Processing Systems.</em> <a href="https://arxiv.org/abs/2306.05685">arXiv:2306.05685</a></li>
+        <li id="ref-szymanski2024"><strong>Szymanski, M. et al.</strong> (2024). Limitations of the LLM-as-a-Judge Approach for Evaluating LLM Outputs in Expert Knowledge Tasks. <em>Proceedings of ACM IUI 2025.</em> <a href="https://doi.org/10.1145/3708359.3712091">doi:10.1145/3708359.3712091</a></li>
+        <li id="ref-chen2024"><strong>Chen, G. H. et al.</strong> (2024). Humans or LLMs as the Judge? A Study on Judgement Biases. <em>arXiv preprint arXiv:2402.10669.</em></li>
+        <li id="ref-jiang2024"><strong>Jiang, W. et al.</strong> (2024). A Survey on LLM-as-a-Judge. <em>arXiv preprint arXiv:2411.15594.</em></li>
+        <li id="ref-li2024"><strong>Li, D. et al.</strong> (2024). LLMs-as-Judges: A Comprehensive Survey on LLM-based Evaluation Methods. <em>arXiv preprint arXiv:2412.05579.</em></li>
+        <li id="ref-edwards2025"><strong>Edwards, G., Tehranchi, F., Miller, S. &amp; Ahmed, F.</strong> (2025). AI Judges in Design: Statistical Perspectives on Achieving Human Expert Equivalence with Vision-Language Models. <em>Proceedings of ASME IDETC/CIE 2025.</em> <a href="https://arxiv.org/abs/2504.00938">arXiv:2504.00938</a></li>
+        <li id="ref-liu2023"><strong>Liu, Y. et al.</strong> (2023). G-Eval: NLG Evaluation Using GPT-4 with Better Human Alignment. <em>Proceedings of EMNLP 2023.</em> <a href="https://arxiv.org/abs/2303.16634">arXiv:2303.16634</a></li>
+        <li id="ref-chong2023jmd"><strong>Chong, L., Raina, A., Goucher-Lambert, K., Kotovsky, K. &amp; Cagan, J.</strong> (2023). The Evolution and Impact of Human Confidence in Artificial Intelligence and in Themselves on AI-Assisted Decision-Making in Design. <em>Journal of Mechanical Design,</em> 145(3), 031401. <a href="https://doi.org/10.1115/1.4055123">doi:10.1115/1.4055123</a></li>
+        <li id="ref-zhang2021"><strong>Zhang, G., Raina, A., Cagan, J. &amp; McComb, C.</strong> (2021). A Cautionary Tale About the Impact of AI on Human Design Teams. <em>Design Studies,</em> 72, 100990.</li>
+        <li id="ref-frich2024"><strong>Frich, J. et al.</strong> (2024). AI-Augmented Brainwriting: Investigating the Use of LLMs in Group Ideation. <em>Proceedings of CHI 2024.</em></li>
+        <li id="ref-clemenlavrsen2024"><strong>Clemen Lavrsen, A. &amp; Daalhuizen, J.</strong> (2024). Balancing Cognitive Load in Design Work: A Conceptual and Narrative Review. <em>DRS2024: Design Research Society Conference.</em></li>
+        <li id="ref-zimmerer2021"><strong>Zimmerer, C. &amp; Matthiesen, S.</strong> (2021). Study on the Impact of Cognitive Load on Performance in Engineering Design. <em>Proceedings of the Design Society.</em></li>
+        <li id="ref-sweller1988"><strong>Sweller, J.</strong> (1988). Cognitive Load During Problem Solving: Effects on Learning. <em>Cognitive Science,</em> 12(2), 257–285.</li>
+        <li id="ref-song2022"><strong>Song, B., Soria Zurita, N., Gyory, J. et al.</strong> (2022). When Faced with Increasing Complexity: The Effectiveness of AI Assistance for Drone Design. <em>Journal of Mechanical Design.</em></li>
+        <li id="ref-kernanfreire2024frontiers"><strong>Kernan Freire, S. et al.</strong> (2024). Knowledge Sharing in Manufacturing Using LLM-Powered Tools: User Study and Model Benchmarking. <em>Frontiers in Artificial Intelligence.</em> <a href="https://doi.org/10.3389/frai.2024.1293084">doi:10.3389/frai.2024.1293084</a></li>
+        <li id="ref-frontiers2026"><strong>Tsakalerou, M., Akhmadi, S., Balgynbayeva, A. &amp; Kumisbek, Y.</strong> (2026). AI-Assisted Design Synthesis and Human Creativity in Engineering Education. <em>Frontiers in Artificial Intelligence,</em> 9, 1714523. <a href="https://doi.org/10.3389/frai.2026.1714523">doi:10.3389/frai.2026.1714523</a></li>
+        <li id="ref-panahi2013"><strong>Panahi, S., Watson, J. &amp; Partridge, H.</strong> (2013). Towards Tacit Knowledge Sharing Over Social Web Tools. <em>Journal of Knowledge Management,</em> 17(3), 379–397. <a href="https://doi.org/10.1108/JKM-11-2012-0364">doi:10.1108/JKM-11-2012-0364</a></li>
+        <li id="ref-arab2022"><strong>Arab, M., LaToza, T. D., Liang, J. &amp; Ko, A. J.</strong> (2022). An Exploratory Study of Sharing Strategic Programming Knowledge. <em>Proceedings of CHI 2022,</em> 66:1–66:15. <a href="https://doi.org/10.1145/3491102.3502070">doi:10.1145/3491102.3502070</a></li>
+        <li id="ref-fillmore1982"><strong>Fillmore, C. J.</strong> (1982). Frame Semantics. In <em>Linguistics in the Morning Calm,</em> ed. Linguistic Society of Korea, pp. 111–137. Hanshin Publishing.</li>
+        <li id="ref-hyland1998"><strong>Hyland, K.</strong> (1998). <em>Hedging in Scientific Research Articles.</em> John Benjamins Publishing. <a href="https://doi.org/10.1075/pbns.54">doi:10.1075/pbns.54</a></li>
+        <li id="ref-toulmin1958"><strong>Toulmin, S. E.</strong> (1958). <em>The Uses of Argument.</em> Cambridge University Press.</li>
+        <li id="ref-grootendorst2022"><strong>Grootendorst, M.</strong> (2022). BERTopic: Neural Topic Modeling with a Class-Based TF-IDF Procedure. <em>arXiv preprint arXiv:2203.05794.</em></li>
+        <li id="ref-mcinnes2018"><strong>McInnes, L., Healy, J. &amp; Melville, J.</strong> (2018). UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction. <em>arXiv preprint arXiv:1802.03426.</em></li>
+        <li id="ref-mcinnes2017"><strong>McInnes, L., Healy, J. &amp; Astels, S.</strong> (2017). hdbscan: Hierarchical Density Based Clustering. <em>Journal of Open Source Software,</em> 2(11), 205. <a href="https://doi.org/10.21105/joss.00205">doi:10.21105/joss.00205</a></li>
+        <li id="ref-gwet2008"><strong>Gwet, K. L.</strong> (2008). Computing Inter-Rater Reliability and Its Variance in the Presence of High Agreement. <em>British Journal of Mathematical and Statistical Psychology,</em> 61(1), 29–48. <a href="https://doi.org/10.1348/000711006X126600">doi:10.1348/000711006X126600</a></li>
+        <li id="ref-feinstein1990"><strong>Feinstein, A. R. &amp; Cicchetti, D. V.</strong> (1990). High Agreement but Low Kappa: I. The Problems of Two Paradoxes. <em>Journal of Clinical Epidemiology,</em> 43(6), 543–549. <a href="https://doi.org/10.1016/0895-4356(90)90158-L">doi:10.1016/0895-4356(90)90158-L</a></li>
+        <li id="ref-gao2025drknows"><strong>Gao, Y. et al.</strong> (2025). Leveraging Medical Knowledge Graphs Into Large Language Models for Diagnosis Prediction: Design and Application Study. <em>JMIR AI,</em> 4, e58670. <a href="https://doi.org/10.2196/58670">doi:10.2196/58670</a></li>
+        <li id="ref-ma2025diverse"><strong>Ma, K., Grandi, D., McComb, C. &amp; Goucher-Lambert, K.</strong> (2025). Do Large Language Models Produce Diverse Design Concepts? A Comparative Study with Human-Crowdsourced Solutions. <em>Journal of Computing and Information Science in Engineering,</em> 25(2), 024501. <a href="https://doi.org/10.1115/1.4067332">doi:10.1115/1.4067332</a></li>
+        <li id="ref-doshi2024"><strong>Doshi, A. R. &amp; Hauser, O. P.</strong> (2024). Generative AI Enhances Individual Creativity but Reduces the Collective Diversity of Novel Content. <em>Science Advances,</em> 10(28), eadn5290. <a href="https://doi.org/10.1126/sciadv.adn5290">doi:10.1126/sciadv.adn5290</a></li>
+        <li id="ref-wang2026cogload"><strong>Wang, P., Liu, H., Zou, L. &amp; Paas, F.</strong> (2026). Overloaded Minds and Machines: A Cognitive Load Framework for Human-AI Symbiosis. <em>Artificial Intelligence Review,</em> 59, 109. <a href="https://doi.org/10.1007/s10462-026-11510-z">doi:10.1007/s10462-026-11510-z</a></li>
+        <li id="ref-legaliesurvey2025"><strong>Ariai, A. et al.</strong> (2025). Natural Language Processing for the Legal Domain: A Survey of Tasks, Datasets, Models and Challenges. <em>ACM Computing Surveys.</em> <a href="https://doi.org/10.1145/3716627">doi:10.1145/3716627</a></li>
+      </ol>
+    </details>
+  </div>
+</section>
+
+<!-- ================== § x · Appendix A ================== -->
+<section id="appendix-a" class="bay">
+  <div class="page page-wide">
+    <div class="section-mark">
+      <span class="section-num">§ x</span>
+      <span class="section-title">Appendix A · Pipeline data diagnostics</span>
+    </div>
+    <details class="expandable">
+      <summary><span class="summary-label">Show pipeline diagnostics</span><span class="summary-count">six tables + full graph</span></summary>
+
+      <p>This appendix summarizes the data volumes, distributions, and graph statistics produced by the DFM knowledge-extraction pipeline described in the main text. All counts reflect the final, merged extraction output after deduplication and quality filtering.</p>
+
+      <table class="data-table">
+        <caption>Table A.1 &middot; Pipeline stage summary from raw scrape to knowledge graph.</caption>
+        <thead><tr><th scope="col">Stage</th><th scope="col">Count</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Raw threads scraped</th><td>12,805</td></tr>
+          <tr><th scope="row">Threads after GPT relevance filter</th><td>639</td></tr>
+          <tr><th scope="row">Posts with answers</th><td>1,399</td></tr>
+          <tr><th scope="row">Posts sent to LLM extraction</th><td>1,936</td></tr>
+          <tr><th scope="row">Unique threads</th><td>911</td></tr>
+          <tr><th scope="row">Unique authors</th><td>1,138</td></tr>
+          <tr><th scope="row">Knowledge frames extracted</th><td>3,879</td></tr>
+          <tr><th scope="row">Avg. frames per post</th><td>3.22</td></tr>
+          <tr><th scope="row">Embedding vectors (3 collections)</th><td>11,637</td></tr>
+          <tr><th scope="row">Graph nodes</th><td>7,864</td></tr>
+          <tr><th scope="row">Structural edges</th><td>8,776</td></tr>
+          <tr><th scope="row">Semantic edges</th><td>4,372</td></tr>
+        </tbody>
+      </table>
+
+      <p>The pipeline begins by scraping question threads from five Stack Exchange sites via the public API. A GPT-based relevance filter retains only threads pertaining to design-for-manufacturability, reducing the corpus from <span class="num">12,805</span> to <span class="num">639</span> threads. Each retained thread is normalized to plain text, and both questions and answers (<span class="num">1,936</span> posts total) are sent to a structured-output LLM call that extracts typed knowledge frames. The resulting frames, posts, authors, and threads form a provenance graph augmented with semantically inferred inter-frame edges.</p>
+
+      <table class="data-table">
+        <caption>Table A.2 &middot; Distribution of extracted knowledge frames by type.</caption>
+        <thead><tr><th scope="col">Frame type</th><th scope="col">Count</th><th scope="col">%</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">heuristic</th><td>1,401</td><td>36.1</td></tr>
+          <tr><th scope="row">observation</th><td>1,345</td><td>34.7</td></tr>
+          <tr><th scope="row">risk</th><td>428</td><td>11.0</td></tr>
+          <tr><th scope="row">principle</th><td>396</td><td>10.2</td></tr>
+          <tr><th scope="row">comparison</th><td>149</td><td>3.8</td></tr>
+          <tr><th scope="row">workaround</th><td>145</td><td>3.7</td></tr>
+          <tr><th scope="row">case</th><td>15</td><td>0.4</td></tr>
+        </tbody>
+      </table>
+
+      <p>Each frame is classified into one of seven substantive types (an eighth, <em>other</em>, is reserved for edge cases and was not observed in the final dataset). <strong>Heuristics</strong> capture personal practices, rules of thumb, or directed advice together with a rationale. <strong>Observations</strong> record empirical, factual, or definitional claims that carry no explicit action or causal mechanism. <strong>Risks</strong> link a set of conditions to a failure mode or operational limitation. <strong>Principles</strong> provide causal explanations of <em>why</em> a phenomenon occurs. <strong>Comparisons</strong> weigh two or more alternatives against each other. <strong>Workarounds</strong> describe non-standard fixes for stated limitations. <strong>Cases</strong> are specific real-world job or incident narratives.</p>
+
+      <table class="data-table">
+        <caption>Table A.3 &middot; Distribution of extracted frames by scope domain.</caption>
+        <thead><tr><th scope="col">Scope domain</th><th scope="col">Count</th><th scope="col">%</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">design_geometry</th><td>1,166</td><td>30.1</td></tr>
+          <tr><th scope="row">machining_process</th><td>581</td><td>15.0</td></tr>
+          <tr><th scope="row">other</th><td>512</td><td>13.2</td></tr>
+          <tr><th scope="row">machine_capability</th><td>507</td><td>13.1</td></tr>
+          <tr><th scope="row">quality</th><td>235</td><td>6.1</td></tr>
+          <tr><th scope="row">programming</th><td>225</td><td>5.8</td></tr>
+          <tr><th scope="row">tooling</th><td>225</td><td>5.8</td></tr>
+          <tr><th scope="row">material</th><td>165</td><td>4.3</td></tr>
+          <tr><th scope="row">shop_operations</th><td>141</td><td>3.6</td></tr>
+          <tr><th scope="row">cost</th><td>122</td><td>3.1</td></tr>
+        </tbody>
+      </table>
+
+      <p>Scope domains indicate the primary technical area a frame addresses. The dominance of <em>design_geometry</em> (30.1%) reflects the pipeline's focus on DFM: many frames concern feature tolerances, wall thicknesses, hole placement, and other geometry-driven constraints. <em>Machining_process</em> and <em>machine_capability</em> together account for a further 28.1%, covering feeds, speeds, tool paths, and machine-specific limitations. The <em>other</em> category (13.2%) captures frames whose scope spans multiple domains or falls outside the predefined taxonomy.</p>
+
+      <table class="data-table">
+        <caption>Table A.4 &middot; Epistemic stance distribution across extracted frames.</caption>
+        <thead><tr><th scope="col">Epistemic stance</th><th scope="col">Count</th><th scope="col">%</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">direct_neutral</th><td>2,619</td><td>67.5</td></tr>
+          <tr><th scope="row">tentative_subjective</th><td>1,022</td><td>26.4</td></tr>
+          <tr><th scope="row">hedged_emphatic</th><td>127</td><td>3.3</td></tr>
+          <tr><th scope="row">absolute_authoritative</th><td>94</td><td>2.4</td></tr>
+          <tr><th scope="row">narrative_implied</th><td>17</td><td>0.4</td></tr>
+        </tbody>
+      </table>
+
+      <p>Epistemic stance captures the confidence and authority with which the original author presents a claim. The majority of frames (67.5%) are <em>direct_neutral</em> — stated matter-of-factly without hedging or strong emphasis. <em>Tentative_subjective</em> frames (26.4%) include qualifiers such as "I think," "usually," or "in my experience." <em>Hedged_emphatic</em> frames combine hedging language with strong conviction, while <em>absolute_authoritative</em> frames present claims as definitive rules. <em>Narrative_implied</em> captures knowledge embedded in storytelling rather than explicit assertion.</p>
+
+      <table class="data-table">
+        <caption>Table A.5 &middot; Applicability levels assigned to extracted frames.</caption>
+        <thead><tr><th scope="col">Applicability</th><th scope="col">Count</th><th scope="col">%</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">context_dependent</th><td>2,724</td><td>70.2</td></tr>
+          <tr><th scope="row">universal</th><td>1,115</td><td>28.7</td></tr>
+          <tr><th scope="row">situational</th><td>40</td><td>1.0</td></tr>
+        </tbody>
+      </table>
+
+      <p>Applicability indicates how broadly a frame generalizes. <em>Context_dependent</em> frames (70.2%) apply only under specific conditions — such as a particular material, machine type, or feature geometry — and require an accompanying <code>example_context</code> field. <em>Universal</em> frames (28.7%) hold across a wide range of conditions without significant qualification. <em>Situational</em> frames (1.0%) are tied to a highly specific, one-off scenario.</p>
+
+      <table class="data-table">
+        <caption>Table A.6 &middot; Edge types in the provenance knowledge graph.</caption>
+        <thead><tr><th scope="col">Edge type</th><th scope="col">Category</th><th scope="col">Count</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">POST_CONTAINS_FRAME</th><td>Structural</td><td>3,879</td></tr>
+          <tr><th scope="row">THREAD_CONTAINS_POST</th><td>Structural</td><td>1,936</td></tr>
+          <tr><th scope="row">POST_AUTHORED_BY</th><td>Structural</td><td>1,936</td></tr>
+          <tr><th scope="row">SE_ANSWERS</th><td>Structural</td><td>1,025</td></tr>
+          <tr><th scope="row">SPECIFIES</th><td>Semantic</td><td>2,159</td></tr>
+          <tr><th scope="row">MITIGATES</th><td>Semantic</td><td>1,218</td></tr>
+          <tr><th scope="row">CAUSAL_LINK</th><td>Semantic</td><td>637</td></tr>
+          <tr><th scope="row">CONTRADICTS</th><td>Semantic</td><td>358</td></tr>
+        </tbody>
+      </table>
+
+      <p>The knowledge graph contains two categories of edges. <strong>Structural edges</strong> encode provenance: which post a frame was extracted from, which thread contains the post, who authored it, and the question–answer relationship between Stack Exchange posts. <strong>Semantic edges</strong> are inferred by a separate LLM pass that classifies the relationship between pairs of frames sharing similar subjects or embeddings. <em>SPECIFIES</em> indicates that one frame adds detail or constraints to another. <em>MITIGATES</em> links a frame (typically a heuristic or workaround) to a risk it addresses. <em>CAUSAL_LINK</em> connects frames sharing a cause–effect relationship. <em>CONTRADICTS</em> flags frames that present conflicting claims, enabling downstream systems to surface disagreements.</p>
+
+      <table class="data-table">
+        <caption>Table A.7 &middot; Distribution of posts sent to extraction by Stack Exchange site.</caption>
+        <thead><tr><th scope="col">Stack Exchange site</th><th scope="col">Posts</th><th scope="col">%</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Engineering</th><td>1,345</td><td>69.5</td></tr>
+          <tr><th scope="row">Electronics</th><td>276</td><td>14.3</td></tr>
+          <tr><th scope="row">Robotics</th><td>174</td><td>9.0</td></tr>
+          <tr><th scope="row">Woodworking</th><td>106</td><td>5.5</td></tr>
+          <tr><th scope="row">Mechanics</th><td>35</td><td>1.8</td></tr>
+          <tr><th scope="row">Total</th><td><strong>1,936</strong></td><td><strong>100</strong></td></tr>
+        </tbody>
+      </table>
+
+      <p>Posts were drawn from five Stack Exchange sites selected for their coverage of manufacturing, machining, and related engineering knowledge. The <em>Engineering</em> site contributes the majority of DFM-relevant content (69.5%), while <em>Electronics</em> and <em>Robotics</em> provide complementary material on electromechanical integration and automation constraints. <em>Woodworking</em> contributes subtractive-manufacturing knowledge that transfers to CNC contexts, and <em>Mechanics</em> provides foundational physics and materials content.</p>
+
+      <figure class="full fig-seamless">
+        <img src="images/graph-all.png" alt="Full knowledge graph with structural and semantic edges" />
+        <figcaption><span class="fig-num">Fig. A.1</span> The full knowledge graph, with structural and semantic edges.</figcaption>
+      </figure>
+    </details>
+  </div>
+</section>
+
+<!-- ================== § xi · Appendix B ================== -->
+<section id="appendix-b" class="bay final">
+  <div class="page">
+    <div class="section-mark">
+      <span class="section-num">§ xi</span>
+      <span class="section-title">Appendix B · Example agent output: climb vs. conventional milling</span>
+    </div>
+    <details class="expandable">
+      <summary><span class="summary-label">Show example agent output</span><span class="summary-count">reasoning walkthrough</span></summary>
+
+      <p>This appendix presents a complete DFM agent response to the query <em>"How do I choose between climb and conventional milling?"</em>, generated using GPT-5 at default reasoning effort. Each section is annotated with its data source:</p>
+
+      <div class="pill-legend">
+        <div><span class="pill pill--kg">KG</span> content traced directly to extracted knowledge frames in the graph.</div>
+        <div><span class="pill pill--llm">LLM</span> content generated by the language model from general engineering knowledge.</div>
+        <div><span class="pill pill--both">KG+LLM</span> LLM synthesis constrained to cite specific frames.</div>
+      </div>
+
+      <div class="query">
+        <p class="query-label">Query</p>
+        <p class="query-text">How do I choose between climb and conventional milling?</p>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="agent-section">
+        <p class="agent-label">Summary <span class="tag-group"><span class="pill pill--both">KG+LLM</span></span></p>
+        <p>The summary is generated after all evidence has been retrieved, traversed, and ranked. It synthesizes across all disciplines into a concise answer.</p>
+        <div class="agent-body block">
+          Climb milling favors accuracy and finish on rigid, backlash-free machines; conventional milling is safer on flexible or backlash-prone setups. Across both, ensure adequate chip load to avoid rubbing/heat, provide chip evacuation, and anticipate finish/burr implications when setting tolerances and edge-breaks.
+        </div>
+      </div>
+
+      <h3>Discipline sections</h3>
+      <p>The agent organizes evidence by engineering domain, selecting disciplines from the <code>ScopeDomain</code> vocabulary in the KnowledgeFrame schema. For this query, five disciplines were populated: <em>machining_process, machine_capability, tooling, quality,</em> and <em>design_geometry</em>. One is shown below in full.</p>
+
+      <h3 class="group">Machining process</h3>
+
+      <div class="agent-section">
+        <p class="agent-label">First-principles rationale <span class="tag-group"><span class="pill pill--llm">LLM</span></span></p>
+        <p>This field is generated entirely from the LLM's general engineering knowledge, not from frames. The prompt requires it to be clearly labeled as inference. For this discipline, the agent produced:</p>
+        <div class="agent-body block">
+          Milling direction changes how the cutter's tangential force vector loads the work and machine drive. On flexible setups, climb's pulling force can draw the tool into the cut and amplify trajectory error, while conventional tends to push back against the drive. Too small a chip load leads to rubbing rather than shearing, raising temperature and provoking work hardening and chatter.
+        </div>
+      </div>
+
+      <div class="agent-section">
+        <p class="agent-label">Governing formulas <span class="tag-group"><span class="pill pill--llm">LLM</span></span></p>
+        <p>Equations the LLM deems relevant to the discipline, not sourced from frames. Three were produced for this discipline, including cantilever deflection (<code>δ = FL³ / 3EI</code>), total compliance (<code>δ_total = δ_tool + δ_work</code>), and a natural frequency scaling rule.</p>
+      </div>
+
+      <div class="agent-section">
+        <p class="agent-label">Evidence <span class="tag-group"><span class="pill pill--kg">KG</span></span></p>
+        <p>Each claim is drawn directly from a knowledge frame's <code>main_point</code> field. The agent retrieved 8 evidence claims for this discipline; one is shown with its source frame data.</p>
+        <dl class="evidence-card">
+          <dt>Claim</dt>
+          <dd>On machines with flexible gantries or slides, climb milling's force can pull the cutter off the programmed path.</dd>
+          <dt>Frame ID</dt>
+          <dd><code>se-electronics-364080-a364100-2</code></dd>
+          <dt>Type / Scope</dt>
+          <dd><code>principle</code> &middot; <code>machine_capability</code></dd>
+          <dt>Applicability</dt>
+          <dd><code>context_dependent</code></dd>
+          <dt>Source quote</dt>
+          <dd class="quote">"Or you may be doing climb milling and the cutter runs well outside of the desired path if the gantry and slides are too flexible."</dd>
+          <dt>Author</dt>
+          <dd>Spehro Pefhany (<span class="num">455K</span> rep, high credibility)</dd>
+        </dl>
+      </div>
+
+      <div class="agent-section">
+        <p class="agent-label">Reasoning chains <span class="tag-group"><span class="pill pill--kg">KG</span></span></p>
+        <p>The agent traverses semantic edges in the knowledge graph to construct causal sequences. Two chains were produced for this discipline; one is shown below.</p>
+        <div class="chain">
+          <p class="chain-title">Too-light cuts lead to burnishing instead of cutting.</p>
+          <div class="chain-step">
+            <p><strong>Root cause.</strong> Cuts that are too light allow elastic deflection so the edge does not bite properly.</p>
+            <p class="src">Frame <code>se-engineering-55277-a55280-0</code> (observation, DKNguyen, medium credibility)</p>
+          </div>
+          <span class="chain-arrow">causal_link</span>
+          <div class="chain-step">
+            <p><strong>Effect.</strong> When depth becomes too shallow, the tool stops cutting and instead burnishes the surface.</p>
+            <p class="src">Frame <code>se-engineering-2413-a40671-4</code> (observation, Pekka, low credibility)</p>
+          </div>
+        </div>
+        <div class="aside">The <code>CAUSAL_LINK</code> edge connecting these frames was classified during the semantic edge inference stage of the pipeline, not by the agent at query time. The agent traverses pre-existing edges to assemble chains.</div>
+      </div>
+
+      <h3 class="group">Design rules</h3>
+
+      <div class="agent-section">
+        <p class="agent-label">Actionable recommendation <span class="tag-group"><span class="pill pill--both">KG+LLM</span></span></p>
+        <p>Design rules are actionable recommendations that the LLM synthesizes from evidence frames. Unlike evidence claims, which describe what the knowledge graph says, design rules state what the <em>designer</em> should do about it — the prompt constrains them to decisions made at the CAD or drawing stage. Eight rules were produced for this query; one is shown with its source frame.</p>
+        <dl class="evidence-card">
+          <dt>Design rule</dt>
+          <dd>When designing parts for flexible gantry / bench-top machines, <strong>add local stiffness or machining stock</strong> near critical contours because climb milling forces can pull the tool off-path on compliant structures.</dd>
+          <dt>Source frame</dt>
+          <dd><code>se-electronics-364080-a364100-2</code></dd>
+          <dt>Frame type</dt>
+          <dd><code>principle</code></dd>
+          <dt>Source quote</dt>
+          <dd class="quote">"Or you may be doing climb milling and the cutter runs well outside of the desired path if the gantry and slides are too flexible."</dd>
+          <dt>Main point</dt>
+          <dd>During climb milling on a machine with a flexible gantry or slides, cutting forces can pull the tool outside the programmed path. Toolpath fidelity depends on machine stiffness.</dd>
+        </dl>
+        <div class="aside">Note that the evidence claim and design rule above cite the same frame. The evidence claim restates the frame's observation; the design rule transforms it into a geometric action the designer controls.</div>
+      </div>
+
+      <h3 class="group">Knowledge gaps</h3>
+
+      <div class="agent-section">
+        <p class="agent-label">Reported gaps <span class="tag-group"><span class="pill pill--llm">LLM</span></span></p>
+        <p>The agent identifies areas where the knowledge graph lacks sufficient evidence to fully answer the query. These gaps serve as both a transparency mechanism for the user and as targets for future data collection.</p>
+        <ol class="gaps">
+          <li>No direct comparative evidence on chip-thickness evolution for climb vs. conventional milling and its effect on heat.</li>
+          <li>No explicit evidence on built-up edge (BUE) tendencies vs. milling direction for different materials.</li>
+          <li>No quantified rigidity or backlash thresholds at which to prefer climb over conventional; guidance is qualitative only.</li>
+          <li>No material-specific direction preference (e.g., aluminum vs. steel) supported by the extracted frames.</li>
+          <li>No direct evidence on burr formation differences between climb and conventional side milling.</li>
+        </ol>
+      </div>
+    </details>
+
+    <!-- Colophon -->
+    <div class="colophon-inline">
+      <p class="colophon-body">Draft companion site for <strong>Capturing Tacit Design for Manufacturing Knowledge from Unstructured Discourse</strong>, ASME IDETC 2026 paper <code>DETC2026-194799</code>. Content is taken directly from the paper; minor grammatical edits and inline explanations have been added where they aid web readability. The authoritative record is the PDF.</p>
+      <p class="footer-meta">DETC2026-194799 &middot; IDETC-CIE &middot; UC Berkeley &middot; April 2026</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+</body>
+</html>
