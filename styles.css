@@ -87,7 +87,7 @@ body { overflow-x: hidden; }
   max-width: var(--measure);
   margin: 0 auto;
   padding: 0 1.5rem;
-  transition: max-width 300ms ease;
+  transition: max-width 300ms ease, margin-left 300ms ease;
 }
 .page-wide { max-width: var(--measure-wide); }
 .page-max { max-width: var(--measure-max); }
@@ -1399,8 +1399,12 @@ details.expandable[open] > summary {
 #width-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 html.wide-mode #width-toggle { color: var(--accent); background: var(--accent-wash); border-color: var(--accent-faint); }
 
-/* Wide mode: expand text column */
-html.wide-mode .page { max-width: min(72rem, 84vw); }
+/* Wide mode: anchor left edge, expand rightward — no centering jump */
+html.wide-mode .page {
+  max-width: 80rem;
+  margin-left: max(1.5rem, min(calc((100vw - var(--measure)) / 2), 20rem));
+  margin-right: 1.5rem;
+}
 html.wide-mode .page-wide { max-width: min(84rem, 92vw); }
 
 /* =========================================================
@@ -1432,6 +1436,35 @@ html.wide-mode .page-wide { max-width: min(84rem, 92vw); }
   text-decoration: none;
 }
 
+.masthead-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.tool-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+.tool-link:hover {
+  color: var(--accent);
+  border-color: var(--accent-faint);
+  background: var(--accent-wash);
+  text-decoration: none;
+}
+
 /* =========================================================
    Sidebar TOC (fixed left, visible at ≥ 1200px)
    ========================================================= */
@@ -1445,8 +1478,10 @@ html.wide-mode .page-wide { max-width: min(84rem, 92vw); }
   overflow-y: auto;
   display: none;
   z-index: 20;
-  background: var(--paper);
-  border-radius: 3px;
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 4px;
   padding: 0.25rem 0.5rem 0.5rem;
 }
 
@@ -1454,10 +1489,9 @@ html.wide-mode .page-wide { max-width: min(84rem, 92vw); }
   #sidenav { display: block; }
 }
 
-/* In wide mode, anchor to left viewport edge with a clear background */
+/* Wide mode: sidebar stays at natural position; add shadow for legibility */
 html.wide-mode #sidenav {
-  left: 0.5rem;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 }
 
 .sidenav-label {
