@@ -16,6 +16,10 @@
 </head>
 <body>
 
+<button id="width-toggle" type="button" aria-label="Toggle wide reading mode" title="Toggle wide reading mode">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+</button>
+
 <button id="theme-toggle" type="button" aria-label="Toggle light and dark theme">
   <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
   <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -31,7 +35,7 @@
   <p class="byline">
     <strong>Douglas P. McGowan</strong> &middot; <strong>Kosa Goucher-Lambert</strong><br />
     University of California, Berkeley &middot; Berkeley, CA<br />
-    <em>Corresponding: <a href="mailto:kosa@berkeley.edu">kosa@berkeley.edu</a></em>
+    <em>Corresponding: <a href="mailto:douglas.mcgowan@nasa.gov">douglas.mcgowan@nasa.gov</a></em>
   </p>
   <p class="meta">
     <span>Keywords</span>
@@ -42,6 +46,12 @@
     <span class="dot">·</span>
     <span>Human-AI interaction</span>
   </p>
+  <div class="masthead-dl">
+    <a href="DETC2026-194799-draft.pdf" class="dl-btn" download>
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download PDF draft
+    </a>
+  </div>
 </header>
 
 <!-- ================== TOC ================== -->
@@ -62,6 +72,23 @@
       <li><a href="#appendix-b"><span class="toc-num">xi</span><span class="toc-text">Appendix B · Example agent output</span></a></li>
     </ol>
   </div>
+</nav>
+
+<nav id="sidenav" aria-label="Page sections">
+  <p class="sidenav-label">Contents</p>
+  <ol class="sidenav-list">
+    <li><a href="#abstract" class="sidenav-link">Abstract</a></li>
+    <li><a href="#introduction" class="sidenav-link">Introduction</a></li>
+    <li><a href="#related-work" class="sidenav-link">Related work</a></li>
+    <li><a href="#methodology" class="sidenav-link">Methodology</a></li>
+    <li><a href="#results" class="sidenav-link">Results</a></li>
+    <li><a href="#discussion" class="sidenav-link">Discussion</a></li>
+    <li><a href="#conclusion" class="sidenav-link">Conclusion</a></li>
+    <li><a href="#acknowledgments" class="sidenav-link">Acknowledgments</a></li>
+    <li><a href="#references" class="sidenav-link">References</a></li>
+    <li><a href="#appendix-a" class="sidenav-link">Appendix A</a></li>
+    <li><a href="#appendix-b" class="sidenav-link">Appendix B</a></li>
+  </ol>
 </nav>
 
 <main>
@@ -198,6 +225,63 @@
   <div class="page">
     <p>A <span class="num">23</span>-field schema was developed for each frame. We developed the schema iteratively based on existing research on structuring knowledge<a class="cite" href="#ref-fillmore1982">[<span class="ref-num">40</span>]<span class="tip">Fillmore (1982). <em>Frame Semantics,</em> in <em>Linguistics in the Morning Calm.</em> Hanshin.</span></a><a class="cite" href="#ref-hyland1998">[<span class="ref-num">41</span>]<span class="tip">Hyland (1998). <em>Hedging in Scientific Research Articles.</em> John Benjamins.</span></a><a class="cite" href="#ref-toulmin1958">[<span class="ref-num">42</span>]<span class="tip">Toulmin (1958). <em>The Uses of Argument.</em> Cambridge University Press.</span></a>, with a focus on preserving nuance by separating the different semantic qualities of each knowledge claim. The schema served to both constrain the LLM's extraction output and structure the required metadata for future analysis. The fields were intentionally structured to capture various knowledge facets.</p>
 
+    <table class="data-table schema-table">
+      <caption>Table 1 &middot; KnowledgeFrame schema fields.</caption>
+      <colgroup>
+        <col>
+        <col>
+        <col>
+      </colgroup>
+      <thead>
+        <tr>
+          <th scope="col">Section</th>
+          <th scope="col">Field</th>
+          <th scope="col">Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="rowgroup" rowspan="8" class="section-group">Post Metadata</th>
+          <td class="field-name"><code>author_username</code></td>
+          <td class="field-desc">Display name of the post author on Stack Exchange.</td>
+        </tr>
+        <tr><td class="field-name"><code>post_id</code></td><td class="field-desc">Unique identifier for the post from the normalizer.</td></tr>
+        <tr><td class="field-name"><code>post_date</code></td><td class="field-desc">ISO date string of when the post was created.</td></tr>
+        <tr><td class="field-name"><code>post_role</code></td><td class="field-desc">Discourse role of the post in the thread (question, solution, addition, war_story).</td></tr>
+        <tr><td class="field-name"><code>post_score</code></td><td class="field-desc">Net votes (upvotes minus downvotes) from the platform.</td></tr>
+        <tr><td class="field-name"><code>is_accepted_answer</code></td><td class="field-desc">Whether this post was marked as the accepted answer.</td></tr>
+        <tr><td class="field-name"><code>question_id_ref</code></td><td class="field-desc">Parent question post ID, for answer-sourced frames.</td></tr>
+        <tr><td class="field-name"><code>source_url</code></td><td class="field-desc">URL to the original Stack Exchange question page.</td></tr>
+        <tr>
+          <th scope="rowgroup" rowspan="7" class="section-group">Knowledge Content</th>
+          <td class="field-name"><code>source_quote</code></td>
+          <td class="field-desc">Verbatim substring from the post supporting this claim; provenance anchor.</td>
+        </tr>
+        <tr><td class="field-name"><code>main_point</code></td><td class="field-desc">One transferable knowledge claim in 2–3 sentences, fully supported by the source quote.</td></tr>
+        <tr><td class="field-name"><code>subject</code></td><td class="field-desc">Concise noun phrase for the primary concept; serves as the graph node anchor.</td></tr>
+        <tr><td class="field-name"><code>example_value</code></td><td class="field-desc">Concrete scenario or worked example from the post that illustrates the claim.</td></tr>
+        <tr><td class="field-name"><code>example_context</code></td><td class="field-desc">Real-world context scoping the claim; required when applicability is not universal.</td></tr>
+        <tr><td class="field-name"><code>extraction_rationale</code></td><td class="field-desc">LLM reasoning for extraction decisions; required when frame type or scope is other.</td></tr>
+        <tr><td class="field-name"><code>thread_context</code></td><td class="field-desc">Summary of the thread context surrounding this frame.</td></tr>
+        <tr>
+          <th scope="rowgroup" rowspan="4" class="section-group">Frame Metadata</th>
+          <td class="field-name"><code>frame_type</code></td>
+          <td class="field-desc">Epistemic category: risk, heuristic, principle, observation, comparison, workaround, case, or other.</td>
+        </tr>
+        <tr><td class="field-name"><code>scope</code></td><td class="field-desc">Knowledge domain: design_geometry, machining_process, material, tooling, programming, shop_operations, quality, cost, or machine_capability.</td></tr>
+        <tr><td class="field-name"><code>applicability</code></td><td class="field-desc">Breadth of the claim: universal, context_dependent, or situational.</td></tr>
+        <tr><td class="field-name"><code>epistemic_stance</code></td><td class="field-desc">How the claim is expressed: absolute_authoritative, direct_neutral, hedged_emphatic, tentative_subjective, or narrative_implied.</td></tr>
+        <tr>
+          <th scope="rowgroup" rowspan="4" class="section-group">Human Review</th>
+          <td class="field-name"><code>validated</code></td>
+          <td class="field-desc">Whether a human reviewer has confirmed this frame.</td>
+        </tr>
+        <tr><td class="field-name"><code>validation_notes</code></td><td class="field-desc">Reviewer notes: edits made, contradiction context, follow-up flags.</td></tr>
+        <tr><td class="field-name"><code>contradicted_by</code></td><td class="field-desc">Frame IDs of frames that contradict this one.</td></tr>
+        <tr><td class="field-name"><code>related_frames</code></td><td class="field-desc">IDs of related or supporting frames.</td></tr>
+      </tbody>
+    </table>
+
     <p>The <code>frame_type</code> classifies what type of claim the frame is making, while the <code>post_role</code> classifies the post's main purpose in the discussion and the <span class="term" tabindex="0"><code>epistemic_stance</code><span class="tip"><strong>Epistemic stance:</strong> how confidently a claim is stated — ranging from <em>absolute_authoritative</em>, <em>direct_neutral</em>, and <em>hedged_emphatic</em> through <em>tentative_subjective</em> to <em>narrative_implied</em>.</span></span> classifies how the post author views the claim being made. These fields help the LLM classify the frame and guide the <code>main_point</code> field, which captures the crux of the frame. The <code>scope</code>, <code>subject</code>, and <code>applicability</code> fields force the LLM to specify where the frame is useful. To force a separation between hypothetical values and discrete heuristics, the <code>example_value</code> and <code>example_context</code> fields have targeted prompts. Finally, the <code>extraction_rationale</code> contains any extra reasoning for the LLM to explain a potentially confusing frame classification.</p>
 
     <p>When prompting the LLM, we used a few-shot approach, embedding examples for each schema field individually. Our prompt encouraged the LLM to extract multiple frames per post to prevent the LLM from collapsing a multi-faceted statement into only a single frame. After this, there was a multi-part filtering step.</p>
@@ -311,7 +395,7 @@
     <p>In analyzing the IRR of this grading scheme, we used <span class="term" tabindex="0">Gwet's AC1<span class="tip"><strong>Gwet's AC1:</strong> a statistical measure of agreement between raters. Unlike Cohen's kappa, it remains stable when most ratings fall into one category — avoiding the kappa paradox.</span></span><a class="cite" href="#ref-gwet2008">[<span class="ref-num">46</span>]<span class="tip">Gwet (2008). <em>Computing Inter-Rater Reliability and Its Variance in the Presence of High Agreement.</em> British J. Math. Stat. Psychology, 61(1).</span></a> to measure agreement in place of the alpha and kappa metrics used in past papers. Because of the vast majority of ratings being in the "good" category, the kappa and alpha ratings understate agreement — a well-documented statistical artifact known as the <span class="term" tabindex="0">kappa paradox<span class="tip"><strong>Kappa paradox:</strong> a statistical artifact where Cohen's kappa reports near-zero or even negative agreement even when raters actually agree on almost everything — caused by uneven prevalence across rating categories.</span></span><a class="cite" href="#ref-feinstein1990">[<span class="ref-num">47</span>]<span class="tip">Feinstein &amp; Cicchetti (1990). <em>High Agreement but Low Kappa: I. The Problems of Two Paradoxes.</em> J. Clinical Epidemiology, 43(6).</span></a>. The perceived randomness of agreement in a rating where one category dominates makes the high agreement of this data seem by chance. For example, since 83–100% of ratings were viewed as "good," the 96% exact agreement on main point quality is actually shown as negative by the Fleiss kappa rating. However, the only way to get a higher rating for that measurement would have been perfect agreement. The three ratings used to measure frame quality had high agreement and high average quality ratings:</p>
 
     <table class="data-table">
-      <caption>Table 1 &middot; Frame quality ratings across human reviewers.</caption>
+      <caption>Table 2 &middot; Frame quality ratings across human reviewers.</caption>
       <thead>
         <tr>
           <th scope="col">Dimension</th>
@@ -334,7 +418,7 @@
     <p>The metadata ratings were more contested, with lower agreement and average ratings. There was significant disagreement among reviewers on the accuracy of each metadata metric, showing the subjectivity of the classification method. While these metadata fields are not essential to the dataset, they can provide a helpful way to search and organize the frames. This insight informed our structuring of the dataset in the case study discussed below.</p>
 
     <table class="data-table">
-      <caption>Table 2 &middot; Metadata classification ratings across human reviewers.</caption>
+      <caption>Table 3 &middot; Metadata classification ratings across human reviewers.</caption>
       <thead>
         <tr>
           <th scope="col">Dimension</th>
@@ -363,14 +447,14 @@
     <h3>Case study: agentic retrieval</h3>
     <p>To demonstrate the usefulness of this knowledge, we use the frame embeddings in a retrieval system. By constructing an agentic <span class="term" tabindex="0">retrieval-augmented generation<span class="tip"><strong>Retrieval-Augmented Generation (RAG):</strong> a technique where a language model retrieves relevant external documents before answering, grounding its output in source material rather than relying only on its training data.</span></span> (RAG) system<a class="cite" href="#ref-lewis2020">[<span class="ref-num">13</span>]<span class="tip">Lewis et al. (2020).</span></a>, we enable a more concrete connection between design advice and experiential commentary. In response to design queries, this agent retrieves vectors, traverses the knowledge graph, synthesizes a response, and identifies gaps in the knowledge base.</p>
 
-    <p>When making a query, the user can adjust three parameters to adjust the scope of knowledge retrieval: <em>N</em>, <em>M</em>, and <em>Q</em>. With every query, the model retrieves the <em>N</em> nearest frames, retrieves any semantically connected nodes within <em>M</em> degrees of removal, and down-selects to <em>Q</em> total frames. Based on these frames, it synthesizes a query response, detailed in Table&nbsp;3, and identifies gaps where the available frames do not provide coverage. The model defaults to a concise response, only listing the reference frame IDs, but the user can easily access details on the frame citations.</p>
+    <p>When making a query, the user can adjust three parameters to adjust the scope of knowledge retrieval: <em>N</em>, <em>M</em>, and <em>Q</em>. With every query, the model retrieves the <em>N</em> nearest frames, retrieves any semantically connected nodes within <em>M</em> degrees of removal, and down-selects to <em>Q</em> total frames. Based on these frames, it synthesizes a query response, detailed in Table&nbsp;4, and identifies gaps where the available frames do not provide coverage. The model defaults to a concise response, only listing the reference frame IDs, but the user can easily access details on the frame citations.</p>
 
     <p>If the user doubts the advice, they can request the context of the discourse behind the frames. In response to this query, the model accesses the provenance graph, and retrieves the structure of the discussions behind each frame, including the author names, author credibility scores, and complete thread content for each of the frames used as evidence. The agent then uses this data to provide a summary of the existing context.</p>
 
     <p>If the user requires information not covered in the available frames, they can request for the model to backfill the identified knowledge gaps with information from textbooks or official standard codes. This application demonstrates that datasets like this can augment the existing capabilities of language models to search for information with specific data on a complex discipline<a class="cite" href="#ref-pan2024">[<span class="ref-num">14</span>]<span class="tip">Pan et al. (2024).</span></a><a class="cite" href="#ref-gao2025drknows">[<span class="ref-num">48</span>]<span class="tip">Gao et al. (2025). <em>Leveraging Medical Knowledge Graphs Into Large Language Models for Diagnosis Prediction.</em> JMIR AI, 4.</span></a>. When compared to a typical LLM response to the same design question, this agent provides a more detailed and grounded response, where there is a clear human link to each response provided. Furthermore, the textbook answers being incorporated into the knowledge gaps enable a comprehensive response. Using agentic retrieval, the best aspects of both general LLM searches and specific graph queries can be combined to provide useful insight. More details on the agent's reasoning process and output can be found in <a href="#appendix-b">Appendix B</a>.</p>
 
-    <table class="data-table">
-      <caption>Table 3 &middot; Structure of a synthesized DFM agent response.</caption>
+    <table class="data-table text-table">
+      <caption>Table 4 &middot; Structure of a synthesized DFM agent response.</caption>
       <thead>
         <tr>
           <th scope="col">Section</th>
@@ -798,13 +882,81 @@
 
 </main>
 
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button id="lightbox-close" type="button" aria-label="Close image viewer">&times;</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
 <script>
-document.querySelector('#theme-toggle').addEventListener('click',()=>{
-  const cur=document.documentElement.getAttribute('data-theme');
-  const next=cur==='dark'?'light':'dark';
-  document.documentElement.setAttribute('data-theme',next);
-  localStorage.setItem('theme',next);
+// Theme toggle
+document.querySelector('#theme-toggle').addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
 });
+
+// Width toggle
+(function () {
+  const btn = document.getElementById('width-toggle');
+  if (localStorage.getItem('wide-mode')) {
+    document.documentElement.classList.add('wide-mode');
+  }
+  btn.addEventListener('click', () => {
+    const wide = document.documentElement.classList.toggle('wide-mode');
+    localStorage.setItem('wide-mode', wide ? '1' : '');
+  });
+})();
+
+// Sidebar TOC active state via IntersectionObserver
+(function () {
+  const links = Array.from(document.querySelectorAll('.sidenav-link'));
+  if (!links.length) return;
+  const sections = links.map(l => document.querySelector(l.getAttribute('href'))).filter(Boolean);
+  let current = sections[0] ? sections[0].id : '';
+
+  const setActive = id => {
+    links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + id));
+  };
+  setActive(current);
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) current = entry.target.id;
+    });
+    setActive(current);
+  }, { rootMargin: '-8% 0px -60% 0px', threshold: 0 });
+
+  sections.forEach(s => obs.observe(s));
+})();
+
+// Lightbox
+(function () {
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightbox-img');
+  const lbClose = document.getElementById('lightbox-close');
+
+  document.querySelectorAll('figure img').forEach(img => {
+    img.addEventListener('click', () => {
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      lbClose.focus();
+    });
+  });
+
+  function closeLb() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  lbClose.addEventListener('click', closeLb);
+  lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && lb.classList.contains('open')) closeLb();
+  });
+})();
 </script>
 
 </body>
