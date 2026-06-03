@@ -35,7 +35,7 @@
   <p class="byline">
     <strong>Douglas P. McGowan</strong> &middot; <strong>Kosa Goucher-Lambert</strong><br />
     University of California, Berkeley &middot; Berkeley, CA<br />
-    <em>Corresponding: <a href="mailto:douglas.mcgowan@nasa.gov">douglas.mcgowan@nasa.gov</a></em>
+    <em>Corresponding: <a href="mailto:dpm5970@berkeley.edu">dpm5970@berkeley.edu</a></em>
   </p>
   <p class="meta">
     <span>Keywords</span>
@@ -556,7 +556,7 @@
       <span class="section-num">§ ix</span>
       <span class="section-title">References</span>
     </div>
-    <details class="expandable" open>
+    <details class="expandable">
       <summary><span class="summary-label">Show all references</span><span class="summary-count">52 works</span></summary>
       <ol class="reflist">
         <li id="ref-ehrlenspiel2007"><strong>Ehrlenspiel, K., Kiewert, A. &amp; Lindemann, U.</strong> (2007). <em>Cost-Efficient Design.</em> Ed. Hundal, M. S. ASME Press / Springer. <a href="https://doi.org/10.1007/978-3-540-34648-7">doi:10.1007/978-3-540-34648-7</a></li>
@@ -618,7 +618,7 @@
 
 <!-- ================== § x · Appendix A ================== -->
 <section id="appendix-a" class="bay">
-  <div class="page page-wide">
+  <div class="page">
     <div class="section-mark">
       <span class="section-num">§ x</span>
       <span class="section-title">Appendix A · Pipeline data diagnostics</span>
@@ -885,6 +885,7 @@
 <div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
   <button id="lightbox-close" type="button" aria-label="Close image viewer">&times;</button>
   <img id="lightbox-img" src="" alt="" />
+  <p id="lightbox-cap"></p>
 </div>
 
 <script>
@@ -935,11 +936,17 @@ document.querySelector('#theme-toggle').addEventListener('click', () => {
   const lb = document.getElementById('lightbox');
   const lbImg = document.getElementById('lightbox-img');
   const lbClose = document.getElementById('lightbox-close');
+  const lbCap = document.getElementById('lightbox-cap');
 
   document.querySelectorAll('figure img').forEach(img => {
     img.addEventListener('click', () => {
       lbImg.src = img.src;
       lbImg.alt = img.alt;
+      const cap = img.closest('figure')?.querySelector('figcaption');
+      if (lbCap) {
+        lbCap.textContent = cap ? cap.textContent : '';
+        lbCap.style.display = cap ? '' : 'none';
+      }
       lb.classList.add('open');
       document.body.style.overflow = 'hidden';
       lbClose.focus();
