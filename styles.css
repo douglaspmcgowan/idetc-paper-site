@@ -87,7 +87,7 @@ body { overflow-x: hidden; }
   max-width: var(--measure);
   margin: 0 auto;
   padding: 0 1.5rem;
-  transition: max-width 300ms ease, margin-left 300ms ease;
+  transition: max-width 300ms ease;
 }
 .page-wide { max-width: var(--measure-wide); }
 .page-max { max-width: var(--measure-max); }
@@ -1399,11 +1399,9 @@ details.expandable[open] > summary {
 #width-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 html.wide-mode #width-toggle { color: var(--accent); background: var(--accent-wash); border-color: var(--accent-faint); }
 
-/* Wide mode: anchor left edge, expand rightward — no centering jump */
+/* Wide mode: expand centered — moderate width keeps shift ≤ 150px */
 html.wide-mode .page {
-  max-width: 80rem;
-  margin-left: max(1.5rem, min(calc((100vw - var(--measure)) / 2), 20rem));
-  margin-right: 1.5rem;
+  max-width: min(56rem, 70vw);
 }
 html.wide-mode .page-wide { max-width: min(84rem, 92vw); }
 
@@ -1489,8 +1487,9 @@ html.wide-mode .page-wide { max-width: min(84rem, 92vw); }
   #sidenav { display: block; }
 }
 
-/* Wide mode: sidebar stays at natural position; add shadow for legibility */
+/* Wide mode: reposition sidebar to stay left of the wider content column */
 html.wide-mode #sidenav {
+  left: max(0.5rem, calc(50vw - min(28rem, 35vw) - 3rem - var(--sidenav-w)));
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 }
 
@@ -1634,7 +1633,7 @@ figure img { cursor: zoom-in; }
   padding-top: 1rem;
 }
 
-.schema-table td {
+.data-table.schema-table tbody td {
   text-align: left;
   font-variant-numeric: normal;
   font-feature-settings: normal;
